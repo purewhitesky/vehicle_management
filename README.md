@@ -5,22 +5,35 @@
 
 ## Started
 ```bash
-yarn
-# or `npm install`
+npm install
 ```
 
 ---
 ## Develop
 ```bash
-yarn dev
-# or `npm run dev`
+npm run dev
 ```
 
 ---
 ## Build
 ```bash
-yarn build
-# or `npm run build`
+npm run build
+```
+
+## 創建docker副本
+```bash
+npm run build
+docker build -t vuedocker{Version} .
+```
+
+## 保存docker副本
+```bash
+docker save -o vuedocker{Version}.tar vuedocker{Version}
+```
+
+## 測試docker副本
+```bash
+docker run -it -p 3000:80  vuedocker{Version}
 ```
 
 ---
