@@ -51,12 +51,12 @@ import {} from "@/api/apiTomtom"
 
 ---
 ## 流程
----
 建立project ID
 建立fences ID
 建立objects ID
 建立notification ID
 建立alert ID
+
 ---
 ## 觸發alert的方式
 Report service 的 post模式 ，全參數必要
