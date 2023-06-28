@@ -1,4 +1,4 @@
-# vue6
+# Tailwindcss & Vite
 
 - **template of:** vite + vue
 - **tailwindcss:** v3.x
