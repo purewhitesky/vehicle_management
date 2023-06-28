@@ -1,0 +1,114 @@
+{
+  "data": [
+    {
+      "id": 0,
+      "Date": "Mar 3, 2021",
+      "VinID": "xxx-xxx-0",
+      "Mileage": 500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "3day",
+      "ProcessingProgress": 40
+    },
+    {
+      "id": 1,
+      "Date": "Mar 3, 2021",
+      "VinID": "xxx-xxx-1",
+      "Mileage": 500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "401,205",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "5day",
+      "ProcessingProgress": 40
+    },
+    {
+      "id": 2,
+      "Date": "Mar 4, 2021",
+      "VinID": "xxx-xxx-2",
+      "Mileage": 500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "10day",
+      "ProcessingProgress": 80
+    },
+    {
+      "id": 3,
+      "Date": "Mar 6, 2021",
+      "VinID": "xxx-xxx-3",
+      "Mileage": 1500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404,101,201",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "3day",
+      "ProcessingProgress": 60
+    },
+    {
+      "id": 4,
+      "Date": "Mar 7, 2021",
+      "VinID": "xxx-xxx-4",
+      "Mileage": 2500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404,000",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "3day",
+      "ProcessingProgress": 45
+    },
+    {
+      "id": 5,
+      "Date": "Mar 7, 2021",
+      "VinID": "xxx-xxx-4",
+      "Mileage": 2500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404,000",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "3day",
+      "ProcessingProgress": 45
+    },
+    {
+      "id": 6,
+      "Date": "Mar 7, 2021",
+      "VinID": "xxx-xxx-4",
+      "Mileage": 2500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404,000",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "3day",
+      "ProcessingProgress": 45
+    },
+    {
+      "id": 7,
+      "Date": "Mar 7, 2021",
+      "VinID": "xxx-xxx-4",
+      "Mileage": 2500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404,000",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "3day",
+      "ProcessingProgress": 45
+    },
+    {
+      "id": 8,
+      "Date": "Mar 7, 2021",
+      "VinID": "xxx-xxx-4",
+      "Mileage": 2500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404,000",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "3day",
+      "ProcessingProgress": 45
+    },
+    {
+      "id": 9,
+      "Date": "Mar 7, 2021",
+      "VinID": "xxx-xxx-4",
+      "Mileage": 2500,
+      "Position": { "lat": "25.041752", "lng": "121.543853" },
+      "ErrorCode": "404,000",
+      "PrimaryCause": "The battery is dead",
+      "PredictedFix": "3day",
+      "ProcessingProgress": 45
+    }
+  ]
+}
