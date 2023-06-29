@@ -60,7 +60,7 @@ const routes = [
   },
   {
     meta: {
-      title: "Test",
+      title: "BMS",
     },
     path: "/bms",
     name: "BMS",
@@ -129,6 +129,14 @@ const routes = [
     path: "/test3", //報錯顯示404頁面
     name: "test3",
     component: () => import("@/views/test3.vue"),
+  },
+  {
+    meta: {
+      title: "testEV",
+    },
+    path: "/testEV", //報錯顯示404頁面
+    name: "testEV",
+    component: () => import("@/views/testEV.vue"),
   },
   {
     meta: {
