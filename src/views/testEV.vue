@@ -45,15 +45,33 @@ onMounted(() => {
       trackUserLocation: true,
     })
   );
+
   map.on("click", (event) => {
     const position = event.lngLat;
     console.log(position);
   });
 
-  console.log(map.getBounds());
+  map.on("moveend", () => {
+    openEVstation();
+    console.log("moveend");
+  });
+
+  //console.log(map.getBounds());
 
   window.map = map;
 });
+
+/*const EVData = ref({
+  IEC62196Type1: { name: " J1772(Type1)" },
+  IEC62196Type1CCS: { name: "CCS1" },
+  EC62196Type2CableAttached: { name: "Type2" },
+  IEC62196Type2Outlet: { name: "Type2" },
+  IEC62196Type2CCS: { name: "CCS2" },
+  Chademo: { name: "CHAdeMO" },
+  GBT20234Part2: { name: "GB/T 20234.2" },
+  GBT20234Part3: { name: "GB/T 20234.3" },
+  Tesla: { name: "Tesla" },
+});*/
 
 const EVNumber = ref([]);
 const openEVstation = () => EVstation(map.getBounds()._sw, map.getBounds()._ne);
@@ -78,6 +96,7 @@ const EVstation = (sw, ne) =>
       if (isEVOpen.value) {
         console.log("Open");
       }
+      console.log(response);
       //console.log(response.results);
       /*var chargingStationID = response.results[0].entryPoints.info;
       tts.services
@@ -118,6 +137,7 @@ function iconElement(marker, index, iconlistNum, isOpen) {
     removeMarker(EVNumber.value);
   }
   //console.log(marker);
+  //================================================
   const svgElement = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "svg"
@@ -125,7 +145,6 @@ function iconElement(marker, index, iconlistNum, isOpen) {
   svgElement.setAttribute("viewBox", "0 0 24 24");
   svgElement.setAttribute("width", "30"); // 設定寬度為 200 像素
   svgElement.setAttribute("height", "30"); // 設定高度為 150 像素
-
   // 創建 SVG 元素的內容 - path 元素
   const pathElement = document.createElementNS(
     "http://www.w3.org/2000/svg",
@@ -133,29 +152,22 @@ function iconElement(marker, index, iconlistNum, isOpen) {
   );
   pathElement.setAttribute("d", mdiEvStation);
   //pathElement.setAttribute("fill", "bg-sky-400");
-
   // 將 path 元素添加到 SVG 元素中
   svgElement.appendChild(pathElement);
-
   // 將 SVG 元素添加到文檔中的 body 元素中
   document.body.appendChild(svgElement);
   //console.log(svgElement);
-
-  /*EVNumber.value[index] = new tt.Marker({ element: svgElement })
-    .setLngLat(marker.position)
-    .addTo(window.map);*/
-
-  EVNumber.value[index] = new tt.Marker()
-    .setLngLat(marker.position)
-    .addTo(window.map);
-
   const popup = new tt.Popup({ offset: popupOffsets }).setHTML(
     `${marker.poi.name}
     <br>RatedPowerKW：${marker.chargingPark.connectors[0].ratedPowerKW}
     <br>CurrentType：${marker.chargingPark.connectors[0].currentType}
     `
   );
+  EVNumber.value[index] = new tt.Marker({ element: svgElement })
+    .setLngLat(marker.position)
+    .addTo(window.map);
   EVNumber.value[index].setPopup(popup);
+  //================================================
 }
 
 const removeMarker = () => {
@@ -170,15 +182,15 @@ const removeMarker = () => {
 };
 </script>
 <template>
-  <LayoutAuthenticated>
+  <LayoutAuthenticated class="m-2">
     <BaseButton
-      class="w-[100%]"
-      label="查詢此區域的充電樁"
+      class="w-full border-2 border-gray-300 dark:border-gray-500"
+      label="View nearby charging stations"
       @click="openEVstation()"
     ></BaseButton>
 
     <div
-      class="h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
+      class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
       id="map"
       ref="mapRef"
     ></div>

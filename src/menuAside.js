@@ -2,24 +2,31 @@ import {
   mdiAccountCircle,
   mdiLock,
   mdiPalette,
-  mdiCarMultiple,
-  mdiMap,
   mdiCarWrench,
   mdiLightningBoltCircle,
   mdiAccountSettings,
   mdiApplicationSettings,
+  mdiTabletDashboard,
+  mdiCarMultiple,
+  mdiMap,
+  mdiWrenchClock,
+  mdiTire,
+  mdiEvStation,
+  mdiCardAccountDetailsOutline,
 } from "@mdi/js";
 
 export default [
   /*{
     to: "/FleetOverview",
     label: "Fleet overview",
-    icon: mdiCarMultiple,
+    
+    //icon: mdiCarMultiple,
     menu: [
       {
         to: "/list",
         label: "list",
-        icon: mdiCarMultiple,
+        
+        //icon: mdiCarMultiple,
       },
       {
         label: "Item Two",
@@ -28,67 +35,91 @@ export default [
   },*/
   /*{
     to: "/car",
-    icon: mdiCar,
+    
+    //icon: mdiCar,
     label: "Car",
   },*/
   {
     to: "/FleetOverview",
-    label: "FleetOverview",
+    label: "Dashboard",
+
+    icon: mdiTabletDashboard,
+  },
+  {
+    to: "/list",
+    label: "Vehicles",
+
     icon: mdiCarMultiple,
   },
   {
-    to: "/FleetTrackingView",
-    label: "FleetTracking",
+    to: "/testEV",
+    label: "ChargingMap",
+
     icon: mdiMap,
   },
   {
     to: "/FleetRepairView",
-    label: "FleetRepair",
-    icon: mdiCarWrench,
+    label: "PHM",
+
+    icon: mdiWrenchClock,
   },
+  {
+    label: "Tire Analysis",
+
+    icon: mdiTire,
+  },
+  {
+    label: "DMS",
+
+    icon: mdiCardAccountDetailsOutline,
+  },
+  {
+    label: "CPO",
+
+    icon: mdiEvStation,
+  },
+
   /*{
-    to: "/",
-    label: "Styles",
-    icon: mdiPalette,
-  },*/
-  {
-    to: "/list",
-    label: "List",
-    icon: mdiAccountCircle,
+    to: "/FleetTrackingView",
+    label: "FleetTracking",
+
+    //icon: mdiMap,
   },
-  {
-    to: "/ChargingMapView",
-    label: "ChargingMap",
-    icon: mdiLightningBoltCircle,
-  },
+
   {
     to: "/Profile",
     label: "Profile",
-    icon: mdiAccountCircle,
+
+    //icon: mdiAccountCircle,
   },
   {
     to: "/PermissionsAccountView",
     label: "PermissionsAccount",
-    icon: mdiAccountSettings,
+
+    //icon: mdiAccountSettings,
   },
   {
     to: "/PermissionsPageView",
     label: "PermissionsPage",
-    icon: mdiApplicationSettings,
+
+    //icon: mdiApplicationSettings,
   },
   {
     to: "/Login",
     label: "Login",
-    icon: mdiLock,
-  },
+
+    //icon: mdiLock,
+  },*/
   /*{
     to: "/error",
     label: "Error",
-    icon: mdiAlertCircle,
+    
+    //icon: mdiAlertCircle,
   },
   {
     label: "Dropdown",
-    icon: mdiViewList,
+    
+    //icon: mdiViewList,
     menu: [
       {
         label: "Item One",

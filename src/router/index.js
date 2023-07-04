@@ -140,6 +140,14 @@ const routes = [
   },
   {
     meta: {
+      title: "testMapFleet",
+    },
+    path: "/testMapFleet", //報錯顯示404頁面
+    name: "testMapFleet",
+    component: () => import("@/views/testMapFleet.vue"),
+  },
+  {
+    meta: {
       title: "testLocationHistory",
     },
     path: "/testLocationHistory", //報錯顯示404頁面
