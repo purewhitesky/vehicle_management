@@ -1,13 +1,14 @@
 <script setup>
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import BaseButton from "@/components/BaseButton.vue";
-import { ref, onMounted, nextTick } from "vue";
-import tt, { map } from "@tomtom-international/web-sdk-maps";
-import tts from "@tomtom-international/web-sdk-services";
-import "@tomtom-international/web-sdk-maps/dist/maps.css"; //必須加入
-import * as turf from "@turf/turf";
 import CardBox from "@/components/CardBox.vue";
 import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
+import tt from "@tomtom-international/web-sdk-maps";
+import tts from "@tomtom-international/web-sdk-services";
+import "@tomtom-international/web-sdk-maps/dist/maps.css"; //必須加入
+import axios from "axios";
+import * as turf from "@turf/turf";
+import { ref, onMounted } from "vue";
 import {
   apiRegisterAdminKey,
   apiRegenerateAdminKey,
@@ -45,6 +46,26 @@ import {
   apiGeofencing,
   apiHistorySendPosition,
 } from "@/api/apiTomtom";
+
+const postData = () => {
+  axios
+    .post("https://mih-fleet.westus2.cloudapp.azure.com/api/geofence", {
+      DataNum: "123",
+    })
+    .then((res) => {
+      console.log("save success Data");
+      console.log(res);
+    });
+};
+
+const gData = () => {
+  axios
+    .get("https://mih-fleet.westus2.cloudapp.azure.com/api/geofence")
+    .then((res) => {
+      console.log("save success Data");
+      console.log(res);
+    });
+};
 
 const allTomTomData = ref(["no data"]);
 
@@ -136,7 +157,7 @@ const Regenerate = () => {
 };
 const List = () => {
   apiListcurrentoptions(
-    "1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj"
+    "lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes"
   ).then((res) => {
     allTomTomData.value = res.data;
     console.log(res);
@@ -146,7 +167,7 @@ const List = () => {
 const Addnewfencetoaproject = (data) => {
   apiAddnewfencetoaproject(
     `ba848e64-c5d1-4190-9d41-2762966ac6f5`,
-    `1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj`,
+    `lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes`,
     {
       name: "first",
       type: "Feature",
@@ -163,18 +184,6 @@ const Addnewfencetoaproject = (data) => {
     }
   ).then((res) => {
     console.log(res.data.geometry);
-    window.map.addLayer({
-      id: "a1",
-      type: "line",
-      source: {
-        type: "geojson",
-        data: res.data.geometry,
-      },
-      paint: {
-        "line-width": 30,
-      },
-    });
-    console.log("OK");
   });
 };
 //=================================================================
@@ -200,7 +209,7 @@ const Listthefencesforagivenproject = () => {
 };
 //查看圍欄詳細
 const Getfencedetails = () => {
-  apiGetfencedetails(ListfencesData.value[0].id).then((res) => {
+  apiGetfencedetails(ListfencesData.value[8].id).then((res) => {
     allTomTomData.value = res.data;
     console.log(res);
     let _center = turf.point(res.data.geometry.coordinates);
@@ -238,7 +247,7 @@ const Getfencedetails = () => {
 const Deletefence = () => {
   apiDeletefence(
     ListfencesData.value[0].id,
-    "1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj"
+    "lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes"
   );
   console.log("ok");
 };
@@ -254,7 +263,7 @@ const Listobjects = () => {
 };
 //新增對象
 const Addnewobject = () => {
-  apiAddnewobject("1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj", {
+  apiAddnewobject("lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes", {
     name: `objects${Math.floor(Math.random() * 10000)}`,
     defaultProject: ListProjectsData.value,
     properties: {},
@@ -280,7 +289,7 @@ const Getobjectdetails = () => {
 const Editobject = () => {
   apiEditobject(
     ListObjectsData.value[0].id,
-    "1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj",
+    "lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes",
     {
       defaultProject: ListProjectsData.value,
       properties: {
@@ -296,7 +305,7 @@ const Editobject = () => {
 const Deleteobject = () => {
   apiDeleteobject(
     ListObjectsData.value[0].id,
-    "1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj"
+    "lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes"
   ).then((res) => {
     console.log(res);
     console.log("is Delete");
@@ -400,8 +409,10 @@ const NotificationsEditContactGroup = () => {
   apiNotifications
     .EditContactGroup(ListContactGroupsData.value[0].id, {
       name: "cjifug",
-      webhookUrls: ["https://mih-fleet.westus2.cloudapp.azure.com/test"],
-      emails: ["cjifug@gmail.com"],
+      webhookUrls: [
+        "https://mih-fleet.westus2.cloudapp.azure.com/api/geofence",
+      ],
+      emails: [],
     })
     .then((res) => {
       console.log(res);
@@ -438,10 +449,10 @@ const NotificationsClearNotificationsHistory = () => {
 //警報
 const apiGeofencingCreateAlertRule = () => {
   apiGeofencing
-    .CreateAlertRule("1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj", {
+    .CreateAlertRule("lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes", {
       name: "goOrLeavel",
       project: ListProjectsData.value,
-      fence: ListfencesData.value[0].id,
+      fence: ListfencesData.value[8].id,
       object: ListObjectsData.value[0].id,
       alertType: "TRANSITION",
       alertRuleConstraints: {
@@ -472,7 +483,7 @@ const apiGeofencingUpdateAlertRulePartially = () => {
   apiGeofencing
     .UpdateAlertRulePartially(
       ListAlertRulesData.value[0].id,
-      "1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj",
+      "lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes",
       {
         enabled: false,
       }
@@ -485,7 +496,7 @@ const apiGeofencingDeleteAlertRule = () => {
   apiGeofencing
     .DeleteAlertRule(
       ListAlertRulesData.value[0].id,
-      "1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj"
+      "lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes"
     )
     .then((res) => {
       console.log(res);
@@ -729,6 +740,14 @@ const route = () => {
         <CardBox>
           <CardBoxComponentTitle title="刪除歷史警報紀錄" />
           <BaseButton label="結果" @click="apiGeofencingDeleteAlertHistory()" />
+        </CardBox>
+        <CardBox>
+          <CardBoxComponentTitle title="put" />
+          <BaseButton label="結果" @click="postData()" />
+        </CardBox>
+        <CardBox>
+          <CardBoxComponentTitle title="get" />
+          <BaseButton label="結果" @click="gData()" />
         </CardBox>
       </div>
     </div>

@@ -182,17 +182,19 @@ const removeMarker = () => {
 };
 </script>
 <template>
-  <LayoutAuthenticated class="m-2">
-    <BaseButton
-      class="w-full border-2 border-gray-300 dark:border-gray-500"
-      label="View nearby charging stations"
-      @click="openEVstation()"
-    ></BaseButton>
+  <LayoutAuthenticated>
+    <div class="m-2">
+      <BaseButton
+        class="w-full border-2 border-gray-200 dark:border-gray-500"
+        label="View nearby charging stations"
+        @click="openEVstation()"
+      ></BaseButton>
 
-    <div
-      class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
-      id="map"
-      ref="mapRef"
-    ></div>
+      <div
+        class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
+        id="map"
+        ref="mapRef"
+      ></div>
+    </div>
   </LayoutAuthenticated>
 </template>

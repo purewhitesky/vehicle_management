@@ -226,18 +226,19 @@ const fuzzySearch = (num) => {
     tts.services
       .fuzzySearch({
         key: TOMTOMKEY,
-        query: "南港展覽館",
+        query: "全家工業三店",
       })
       .then(callbackFnArr);
   } else {
     tts.services
       .fuzzySearch({
         key: TOMTOMKEY,
-        query: "南港展覽館",
+        query: "全家工業三店",
         bestResult: true,
       })
       .then(callbackFn);
   }
+
   openIcon.value = true;
   outData.value = `if (num == 0) {
     if (openIcon.value) {

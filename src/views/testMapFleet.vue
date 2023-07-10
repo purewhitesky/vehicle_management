@@ -6,6 +6,8 @@ import {
   apiListthefencesforagivenproject,
   apiListprojects,
   apiGetfencedetails,
+  apipostReport,
+  apiListobjects,
 } from "@/api/apiTomtom";
 import { mdiStore, mdiCar, mdiMapMarkerRadiusOutline, mdiTruck } from "@mdi/js";
 import * as turf from "@turf/turf";
@@ -180,7 +182,7 @@ const Addnewfencetoaproject = (data, lng, lat, counter = 0) => {
   const retryTimes = 5;
   apiAddnewfencetoaproject(
     `ba848e64-c5d1-4190-9d41-2762966ac6f5`,
-    `1n7ESSUGBnwnU96gbzYtdX3rYhikRwVOeyagQWSDuC9xCbUj`,
+    `lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes`,
     {
       name: data,
       type: "Feature",
@@ -240,8 +242,6 @@ intervalId = window.setInterval(() => {
     let GPSlng = saveRoadPoint.value[placePoint.value][GPSCount.value][0];
     let GPSlat = saveRoadPoint.value[placePoint.value][GPSCount.value][1];
     let GPSColor = saveRoadPoint.value[placePoint.value][GPSCount.value][2];
-
-    console.log(GPSCount.value);
     GPSNumber.value[GPSCount.value] = new tt.Marker({
       element: iconSytle(mdiTruck, iconColor(GPSColor)),
     })
@@ -254,7 +254,7 @@ intervalId = window.setInterval(() => {
       lat: GPSlat,
       lng: GPSlng,
     });
-
+    //getReport(GPSlng, GPSlat);
     if (GPSCount.value > 0) {
       //增加首次啟動時判斷式(下橋開始)
       if (GPSCount.value != firstGPS) {
@@ -278,6 +278,50 @@ intervalId = window.setInterval(() => {
     }
   }
 }, 300);
+//=====================================================
+let aData = new Date();
+let Month =
+  aData.getMonth() < 9 ? "0" + (aData.getMonth() + 1) : aData.getMonth() + 1;
+let Hours = aData.getHours() <= 9 ? "0" + aData.getHours() : aData.getHours();
+let Minutes =
+  aData.getMinutes() <= 9 ? "0" + aData.getMinutes() : aData.getMinutes();
+let Seconds =
+  aData.getSeconds() <= 9 ? "0" + aData.getSeconds() : aData.getSeconds();
+let timeData =
+  aData.getFullYear() +
+  "-" +
+  Month +
+  "-" +
+  aData.getDate() +
+  "T" +
+  Hours +
+  ":" +
+  Minutes +
+  ":" +
+  Seconds;
+
+const ListObjectsData = ref([]);
+const Listobjects = (data) => {
+  apiListobjects().then((res) => {
+    ListObjectsData.value = res.data.objects[0].id;
+    console.log(ListObjectsData.value);
+  });
+};
+const getReport = (lng, lat, objectName = "") => {
+  Listobjects();
+  apipostReport(
+    ListProjectsData.value,
+    lng,
+    lat,
+    0,
+    ListObjectsData.value,
+    0,
+    timeData
+  ).then((res) => {
+    console.log(res.data);
+  });
+  //HistorySendPosition(GPSgo[num].lng, GPSgo[num].lat);
+};
 //=====================================================
 const iconColor = (colordata) => {
   let GPSIconColor = "";
@@ -500,6 +544,11 @@ const Getfencedetails = (fencesData, counter = 0) => {
           class="grid border-2 border-gray-200 dark:border-gray-500"
           label="Show Fence"
           @click="Listprojects()"
+        ></BaseButton>
+        <BaseButton
+          class="grid border-2 border-gray-200 dark:border-gray-500"
+          label="Show objects"
+          @click="Listobjects()"
         ></BaseButton>
       </BaseButtons>
       <div
