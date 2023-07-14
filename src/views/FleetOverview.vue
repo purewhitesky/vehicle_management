@@ -77,6 +77,7 @@ import {
   mdiEvStation,
   mdiCar,
 } from "@mdi/js";
+
 const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
 const mapRef = ref(null);
 const center = { lat: 25.034228, lng: 121.563995 };
@@ -105,6 +106,9 @@ onMounted(() => {
       orient: "vertical",
       left: "left",
     },
+
+    //切換顏色
+    color: ["#8CEA00", "#F75000", "#FF8000", "#F9F900"],
     series: [
       {
         name: "Access From",
@@ -136,24 +140,16 @@ onMounted(() => {
         [57.1, 16, "Warning"],
       ],
     },
-    grid: { containLabel: true },
+    grid: { containLabel: true, right: "15%", left: "1%" },
     xAxis: { name: "amount" },
     yAxis: { type: "category" },
-    visualMap: {
-      orient: "horizontal",
-      left: "center",
-      min: 10,
-      max: 100,
 
-      // Map the score column to color
-      dimension: 0,
-      inRange: {
-        color: ["#65B581", "#FFCE34", "#FD665F"],
-      },
-    },
+    //切換顏色
+    color: ["#FFCE34", "#FD665F"],
     series: [
       {
         type: "bar",
+        colorBy: "data",
         encode: {
           // Map the "amount" column to X axis.
           x: "amount",
@@ -164,7 +160,7 @@ onMounted(() => {
     ],
   };
 
-  option.value = {
+  /*option.value = {
     title: [
       {
         subtext: "10 drives",
@@ -260,6 +256,192 @@ onMounted(() => {
         },
       },
     ],
+  };*/
+  option.value = {
+    title: [
+      //first title/subtitle
+      {
+        text: "Speeding",
+        left: "10%",
+        textAlign: "center",
+        top: "45%",
+        textStyle: {
+          fontSize: "0.65rem",
+        },
+      },
+      {
+        subtext: `${data1.value[0].value}` + "{aaa| drivers}",
+        left: "10%",
+        textAlign: "center",
+        bottom: "25%",
+        subtextStyle: {
+          fontStyle: "bold",
+          color: "",
+          fontSize: "0.85rem",
+          rich: {
+            aaa: {
+              fontStyle: "",
+              color: "#ADADAD",
+              fontSize: "0.65rem",
+            },
+          },
+        },
+      },
+
+      //second title/subtitle
+      {
+        text: "Harsh braking",
+        left: "45%",
+        textAlign: "center",
+        top: "45%",
+        textStyle: {
+          fontSize: "0.65rem",
+        },
+      },
+      {
+        subtext: `${data2.value[0].value}` + "{aaa| drivers}",
+        left: "45%",
+        textAlign: "center",
+        bottom: "25%",
+        subtextStyle: {
+          fontStyle: "bold",
+          color: "",
+          fontSize: "0.85rem",
+          rich: {
+            aaa: {
+              fontStyle: "",
+              color: "#ADADAD",
+              fontSize: "0.65rem",
+            },
+          },
+        },
+      },
+
+      //third title/subtitle
+      {
+        text: "  After-hours\nvehicle usage",
+        left: "83.33%",
+        textAlign: "center",
+        top: "42.5%",
+        textStyle: {
+          fontSize: "0.65rem",
+        },
+      },
+      {
+        subtext: `${data3.value[0].value}` + "{aaa| drivers}",
+        left: "83.33%",
+        textAlign: "center",
+        bottom: "25%",
+
+        subtextStyle: {
+          fontStyle: "bold",
+          color: "",
+          fontSize: "0.85rem",
+          rich: {
+            aaa: {
+              fontStyle: "",
+              color: "#ADADAD",
+              fontSize: "0.65rem",
+            },
+          },
+        },
+      },
+    ],
+    color: ["#CE0000", "#F0F0F0"],
+    series: [
+      //first cirlce
+      {
+        name: "",
+        type: "pie",
+        radius: ["70%", "55%"],
+        center: ["40%", "25%"],
+        left: 0,
+        right: "66.6667%",
+        top: 0,
+        bottom: 0,
+        labelLine: {
+          length: 30,
+        },
+        emphasis: {
+          disabled: true,
+        },
+        label: {
+          position: "center",
+
+          formatter: ["{a|{d}}", "%"].join(""),
+          rich: {
+            a: {
+              fontSize: "1rem",
+              fontWeight: "bold",
+              color: "inherit",
+            },
+          },
+        },
+        data: data1.value,
+      },
+
+      //second circle
+      {
+        name: "",
+        type: "pie",
+        radius: ["70%", "55%"],
+        center: ["50%", "25%"],
+        left: "33.3333%",
+        right: "33.3333%",
+        top: 0,
+        bottom: 0,
+        labelLine: {
+          length: 30,
+        },
+        emphasis: {
+          disabled: true,
+        },
+        label: {
+          position: "center",
+
+          formatter: ["{a|{d}}", "%"].join(""),
+          rich: {
+            a: {
+              fontSize: "1rem",
+              fontWeight: "bold",
+              color: "inherit",
+            },
+          },
+        },
+        data: data2.value,
+      },
+
+      //third circle
+      {
+        name: "",
+        type: "pie",
+        radius: ["70%", "55%"],
+        center: ["60%", "25%"],
+        left: "66.6667%",
+        right: 0,
+        top: 0,
+        bottom: 0,
+        labelLine: {
+          length: 30,
+        },
+        emphasis: {
+          disabled: true,
+        },
+        label: {
+          position: "center",
+
+          formatter: ["{a|{d}}", "%"].join(""),
+          rich: {
+            a: {
+              fontSize: "1rem",
+              fontWeight: "bold",
+              color: "inherit",
+            },
+          },
+        },
+        data: data3.value,
+      },
+    ],
   };
   option2.value = {
     xAxis: {
@@ -277,4 +459,22 @@ onMounted(() => {
     ],
   };
 });
+
+//first data
+const data1 = ref([
+  { value: 9, name: "useless0" },
+  { value: 91, name: "used0", label: { show: false } },
+]);
+
+//second data
+const data2 = ref([
+  { value: 11, name: "useless1" },
+  { value: 89, name: "used1", label: { show: false } },
+]);
+
+//third data
+const data3 = ref([
+  { value: 5, name: "useless2" },
+  { value: 95, name: "used2", label: { show: false } },
+]);
 </script>
