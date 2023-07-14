@@ -165,7 +165,8 @@ const List = () => {
 };
 
 const Addnewfencetoaproject = (data) => {
-  apiAddnewfencetoaproject(
+  console.log(data[0].geometry.coordinates);
+  /*apiAddnewfencetoaproject(
     `ba848e64-c5d1-4190-9d41-2762966ac6f5`,
     `lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes`,
     {
@@ -184,7 +185,7 @@ const Addnewfencetoaproject = (data) => {
     }
   ).then((res) => {
     console.log(res.data.geometry);
-  });
+  });*/
 };
 //=================================================================
 //查看項目
@@ -209,7 +210,7 @@ const Listthefencesforagivenproject = () => {
 };
 //查看圍欄詳細
 const Getfencedetails = () => {
-  apiGetfencedetails(ListfencesData.value[8].id).then((res) => {
+  apiGetfencedetails(ListfencesData.value[1].id).then((res) => {
     allTomTomData.value = res.data;
     console.log(res);
     let _center = turf.point(res.data.geometry.coordinates);
@@ -452,7 +453,8 @@ const apiGeofencingCreateAlertRule = () => {
     .CreateAlertRule("lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes", {
       name: "goOrLeavel",
       project: ListProjectsData.value,
-      fence: ListfencesData.value[8].id,
+      //fence: ListfencesData.value[1].id,
+      fence: "*",
       object: ListObjectsData.value[0].id,
       alertType: "TRANSITION",
       alertRuleConstraints: {
@@ -539,7 +541,7 @@ const route = () => {
           },
         });
       });
-      Addnewfencetoaproject(roadline);
+      //Addnewfencetoaproject(roadline);
       //removeBoolen.value = true;
     });
   apiSynchronousMatrix({

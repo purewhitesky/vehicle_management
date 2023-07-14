@@ -7,17 +7,27 @@ import {
   apiListprojects,
   apiGetfencedetails,
   apipostReport,
+  apigetReport,
   apiListobjects,
 } from "@/api/apiTomtom";
-import { mdiStore, mdiCar, mdiMapMarkerRadiusOutline, mdiTruck } from "@mdi/js";
+import { getTomTomAlert } from "@/api/obd_alwayshow";
+import {
+  mdiMapMarkerRadiusOutline,
+  mdiTruck,
+  mdiAlert,
+  mdiCarBack,
+  mdiBellAlert,
+} from "@mdi/js";
 import * as turf from "@turf/turf";
-import axios from "axios";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
+import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
+import CardBox from "@/components/CardBox.vue";
+import BaseIcon from "@/components/BaseIcon.vue";
 
 const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
 
@@ -37,9 +47,28 @@ const routeData = ref([
   "全家中研店,台北市南港區",
   "林口物流中心",
 ]);
-
+const js = ref({
+  title: "goOrLeavel - b72b7c6f-10d4-4ed6-ab7c-6f10d49ed6c0",
+  body: '"objects7951" entered "\u5168\u5bb6\u5de5\u696d\u4e09\u5e97,\u53f0\u5317\u5e02\u5357\u6e2f\u5340" on 2023-07-12 at 01:21:26 (UTC).',
+  contextData: {
+    estimatedTransitionTime: "2023-07-12T01:21:26.270638953Z",
+    eventType: "TRANSITION",
+    fenceName:
+      "\u5168\u5bb6\u5de5\u696d\u4e09\u5e97,\u53f0\u5317\u5e02\u5357\u6e2f\u5340",
+    estimatedTransitionPositionLongitude: 121.6136872010061,
+    alertName: "goOrLeavel",
+    objectName: "objects7951",
+    alertId: "b72b7c6f-10d4-4ed6-ab7c-6f10d49ed6c0",
+    projectName: "Geofences creator",
+    projectId: "ba848e64-c5d1-4190-9d41-2762966ac6f5",
+    fenceId: "4a38138e-6b46-4628-8a67-376bae736d48",
+    transitionType: "ENTER",
+    estimatedTransitionPositionLatitude: 25.055958374371187,
+    objectId: "f49cd369-4cf6-460f-9f7c-0735c80b3502",
+  },
+});
+//console.log(js.value.body);
 const MapGPS = ref();
-const isOpenTime = ref(false);
 onMounted(() => {
   let map = tt.map({
     key: TOMTOMKEY,
@@ -64,11 +93,17 @@ onMounted(() => {
   /*map.on("data", (event) => {
     console.log(event);
   });*/
-
+  map.on("click", (event) => {
+    //Listprojects()
+    console.log(event.lngLat);
+    //觸發測試
+    //getReport(event.lngLat.lng, event.lngLat.lat);
+  });
   window.map = map;
 });
 onUnmounted(() => {
   clearInterval(intervalId);
+  clearInterval(intervalId2);
 });
 //=====================================================
 const address = ref([]);
@@ -102,13 +137,17 @@ const WaypointOptimization = (data) => {
       vehicleLoadType: ["USHazmatClass3", "otherHazmatExplosive"],
     },
   }).then((res) => {
-    res.data.optimizedOrder.forEach((features, index) => {
-      address1.value[index] = data[features].point;
+    console.log(res);
+    res.data.optimizedOrder.forEach((placeName, placeIndex) => {
+      console.log(data[placeName]);
+      address1.value[placeIndex] = data[placeName].point;
+
       /*Addnewfencetoaproject(
-        routeData.value[index],
-        address1.value[index].longitude,
-        address1.value[index].latitude
+        routeData.value[placeName],
+        address1.value[placeIndex].longitude,
+        address1.value[placeIndex].latitude
       );*/
+
       //console.log(address1.value[index]);
       //console.log(routeData.value[index], index);
       /*if (index >= 10 && index < 12) {
@@ -120,9 +159,9 @@ const WaypointOptimization = (data) => {
         );
       }*/
       marker(
-        address1.value[index].longitude,
-        address1.value[index].latitude,
-        features
+        address1.value[placeIndex].longitude,
+        address1.value[placeIndex].latitude,
+        placeName
       );
     });
     route(address1.value);
@@ -131,8 +170,6 @@ const WaypointOptimization = (data) => {
 
 //=====================================================
 //路徑生成
-//saveRoadPoint計時器
-let intervalId;
 const saveRoadPoint = ref([]);
 
 const route = (data) => {
@@ -217,10 +254,50 @@ const Addnewfencetoaproject = (data, lng, lat, counter = 0) => {
     });
 };
 //=====================================================
+//資料長輪詢
+const alertData = ref({});
+const oldalertTime = ref();
+const alretArr = ref([]);
+const alertCount = ref(0);
+//長輪詢計時器
+let intervalId2;
+const alertUse = () => {
+  intervalId2 = window.setInterval(() => {
+    getTomTomAlert().then((res) => {
+      // 在这里处理获取到的数据
+      alertData.value = res.data;
+      console.log(alertData.value);
+
+      let transitionType = alertData.value.contextData.transitionType;
+      let objectId = alertData.value.contextData.objectName;
+      let fenceName = alertData.value.contextData.fenceName;
+      let time = res.data.contextData.estimatedTransitionTime;
+      if (transitionType != "DWELL") {
+        if (alertCount.value == 0) {
+          oldalertTime.value = time;
+          alretArr.value.unshift({ objectId, transitionType, fenceName });
+          alertCount.value = 1;
+        } else if (
+          oldalertTime.value !=
+          alertData.value.contextData.estimatedTransitionTime
+        ) {
+          oldalertTime.value =
+            alertData.value.contextData.estimatedTransitionTime;
+
+          alretArr.value.unshift({ objectId, transitionType, fenceName, time });
+        }
+      }
+    });
+  }, 1000);
+};
+
+//=====================================================
 //假資料生成
 const GPSCount = ref(0);
 const placePoint = ref(0);
 const GPSNumber = ref([]);
+//saveRoadPoint計時器
+let intervalId;
 
 intervalId = window.setInterval(() => {
   if (saveRoadPoint.value != "") {
@@ -234,7 +311,7 @@ intervalId = window.setInterval(() => {
       GPSCount.value = 0;
       GPSNumber.value = [];
     }
-    let firstGPS = 360;
+    let firstGPS = 450;
     if (placePoint.value == 0 && GPSCount.value == 0) {
       GPSCount.value = firstGPS;
     }
@@ -243,7 +320,7 @@ intervalId = window.setInterval(() => {
     let GPSlat = saveRoadPoint.value[placePoint.value][GPSCount.value][1];
     let GPSColor = saveRoadPoint.value[placePoint.value][GPSCount.value][2];
     GPSNumber.value[GPSCount.value] = new tt.Marker({
-      element: iconSytle(mdiTruck, iconColor(GPSColor)),
+      element: iconSytle(mdiCarBack, iconColor(GPSColor)),
     })
       .setLngLat({
         lat: GPSlat,
@@ -254,7 +331,7 @@ intervalId = window.setInterval(() => {
       lat: GPSlat,
       lng: GPSlng,
     });
-    //getReport(GPSlng, GPSlat);
+    getReport(GPSlng, GPSlat);
     if (GPSCount.value > 0) {
       //增加首次啟動時判斷式(下橋開始)
       if (GPSCount.value != firstGPS) {
@@ -277,8 +354,9 @@ intervalId = window.setInterval(() => {
       GPSCount.value += 1;
     }
   }
-}, 300);
+}, 2000);
 //=====================================================
+//現在時間製作
 let aData = new Date();
 let Month =
   aData.getMonth() < 9 ? "0" + (aData.getMonth() + 1) : aData.getMonth() + 1;
@@ -304,7 +382,7 @@ const ListObjectsData = ref([]);
 const Listobjects = (data) => {
   apiListobjects().then((res) => {
     ListObjectsData.value = res.data.objects[0].id;
-    console.log(ListObjectsData.value);
+    //console.log(ListObjectsData.value);
   });
 };
 const getReport = (lng, lat, objectName = "") => {
@@ -419,6 +497,7 @@ const routeNameData = (data) => {
 
 //模糊搜索
 const addressData = () => {
+  Listprojects();
   /*tts.services
     .geocode({
       batchMode: "sync",
@@ -435,6 +514,7 @@ const addressData = () => {
       batchItems: routeNameDataArr.value,
     })
     .then(callbackFn);
+  alertUse();
 };
 
 const ListProjectsData = ref([]);
@@ -540,22 +620,56 @@ const Getfencedetails = (fencesData, counter = 0) => {
           label="Show Itinerary"
           @click="addressData()"
         ></BaseButton>
+        <!--
+
+        
         <BaseButton
           class="grid border-2 border-gray-200 dark:border-gray-500"
           label="Show Fence"
           @click="Listprojects()"
         ></BaseButton>
+        
         <BaseButton
           class="grid border-2 border-gray-200 dark:border-gray-500"
           label="Show objects"
           @click="Listobjects()"
         ></BaseButton>
+        -->
       </BaseButtons>
-      <div
-        class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
-        id="map"
-        ref="mapRef"
-      ></div>
+      <div class="mt-2 grid h-[75vh] grid-cols-5 gap-2">
+        <CardBox
+          class="col-span-4 border-2 border-gray-200 dark:border-gray-500"
+        >
+          <div
+            class="h-[100%] w-auto lg:h-[100%] lg:w-[100%]"
+            id="map"
+            ref="mapRef"
+          ></div>
+        </CardBox>
+        <CardBox
+          class="overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
+        >
+          <CardBoxComponentTitle title="Alert Event" main class="border-b-2">
+          </CardBoxComponentTitle>
+          <div
+            class="mt-2 grid gap-2 rounded-lg border-2"
+            v-for="(item, index) in alretArr"
+          >
+            <div class="border-b-2 text-red-400">
+              <BaseIcon
+                :path="mdiBellAlert"
+                w=""
+                size="20"
+                class="m-2 text-red-400"
+              />{{ item.transitionType }}
+            </div>
+            <div>{{ item.objectId }}</div>
+            <div>{{ item.fenceName }}</div>
+            <div>{{ item.time }}</div>
+          </div>
+        </CardBox>
+      </div>
     </div>
   </LayoutAuthenticated>
 </template>
+<style></style>

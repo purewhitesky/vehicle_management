@@ -1,5 +1,5 @@
-/*import myAxios from "./axios";
-
+import myAxios from "./axios";
+/*
 export function getPageAPI(param) {
   return myAxios({
     url: "/api/get/obd_sec",
@@ -55,6 +55,4 @@ export const getHistoryAPI = (param) =>
 export const getUserAPI = (param) =>
   MIHapi.get(`/api/get/car`, { params: param });
 
-export const getTomTomAlert = () => {
-  MIHapi.get(`/api/geofence`);
-};
+export const getTomTomAlert = () => MIHapi.get(`/api/geofence`);
