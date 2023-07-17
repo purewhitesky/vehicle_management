@@ -209,6 +209,10 @@ const route = (data) => {
             type: "geojson",
             data: features,
           },
+          paint: {
+            "line-width": 3,
+            "line-opacity": 0.5,
+          },
         });
       });
     });
@@ -271,7 +275,37 @@ const alertUse = () => {
       let transitionType = alertData.value.contextData.transitionType;
       let objectId = alertData.value.contextData.objectName;
       let fenceName = alertData.value.contextData.fenceName;
+      fenceName = fenceName.replace(",台北市南港區", "");
+
       let time = res.data.contextData.estimatedTransitionTime;
+
+      let aData = new Date(time);
+      let Month =
+        aData.getMonth() < 9
+          ? "0" + (aData.getMonth() + 1)
+          : aData.getMonth() + 1;
+      let Hours =
+        aData.getHours() <= 9 ? "0" + aData.getHours() : aData.getHours();
+      let Minutes =
+        aData.getMinutes() <= 9 ? "0" + aData.getMinutes() : aData.getMinutes();
+      let Seconds =
+        aData.getSeconds() <= 9 ? "0" + aData.getSeconds() : aData.getSeconds();
+      let timeData =
+        aData.getFullYear() +
+        "-" +
+        Month +
+        "-" +
+        aData.getDate() +
+        " " +
+        Hours +
+        ":" +
+        Minutes +
+        ":" +
+        Seconds;
+
+      console.log(timeData);
+      time = timeData;
+
       if (transitionType != "DWELL") {
         if (alertCount.value == 0) {
           oldalertTime.value = time;
@@ -311,7 +345,7 @@ intervalId = window.setInterval(() => {
       GPSCount.value = 0;
       GPSNumber.value = [];
     }
-    let firstGPS = 450;
+    let firstGPS = 550;
     if (placePoint.value == 0 && GPSCount.value == 0) {
       GPSCount.value = firstGPS;
     }
@@ -652,16 +686,18 @@ const Getfencedetails = (fencesData, counter = 0) => {
           <CardBoxComponentTitle title="Alert Event" main class="border-b-2">
           </CardBoxComponentTitle>
           <div
-            class="mt-2 grid gap-2 rounded-lg border-2"
+            class="mt-2 grid gap-2 rounded-lg border-2 text-center"
             v-for="(item, index) in alretArr"
           >
-            <div class="border-b-2 text-red-400">
+            <div class="flex border-b-2 text-left text-red-400">
               <BaseIcon
                 :path="mdiBellAlert"
-                w=""
-                size="20"
+                size="16"
                 class="m-2 text-red-400"
-              />{{ item.transitionType }}
+              />
+              <div class="flex place-items-center">
+                {{ item.transitionType }}
+              </div>
             </div>
             <div>{{ item.objectId }}</div>
             <div>{{ item.fenceName }}</div>
