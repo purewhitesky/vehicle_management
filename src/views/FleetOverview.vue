@@ -7,54 +7,73 @@
       main
     >
     </SectionTitleLineWithButton>
-    <div class="m-6 grid grid-cols-2 gap-2">
-      <div class="grid h-screen grid-cols-2 grid-rows-3 gap-2">
-        <CardBox class="border-2 border-gray-200 dark:border-gray-500">
+    <div class="m-6 grid grid-cols-2 gap-1">
+      <div class="grid h-screen grid-cols-2 grid-rows-3 gap-1">
+        <CardBox
+          hasComponentLayout
+          class="flex gap-2 border-2 border-gray-200 p-2 dark:border-gray-500"
+        >
           <CardBoxComponentHeader
-            class="rounded-lg bg-sky-400"
+            class="rounded-lg border-b-2 bg-slate-200 text-xl dark:bg-slate-500"
             title="Vehicles"
-            :icon="mdiHeartPulse"
           />
-          <div class="m-2 h-[90%]">
-            <CardBoxComponentHeader title="Total:100" />
+          <CardBoxComponentHeader title="Total:100"></CardBoxComponentHeader>
+          <div class="mx-4 h-[100%]">
             <v-chart :option="optionCarList" autoresize />
           </div>
         </CardBox>
-        <CardBox class="border-2 border-gray-200 dark:border-gray-500">
+        <CardBox
+          hasComponentLayout
+          class="flex gap-2 border-2 border-gray-200 p-2 dark:border-gray-500"
+        >
           <CardBoxComponentHeader
-            class="rounded-lg bg-sky-400"
+            class="rounded-lg border-b-2 bg-slate-200 text-xl dark:bg-slate-500"
             title="Safety"
-            :icon="mdiHeartPulse"
           />
-
-          <div class="m-2 h-[90%]">
+          <div class="mx-4 h-[100%]">
             <v-chart :option="option" autoresize />
           </div>
         </CardBox>
 
         <CardBox
-          class="col-span-2 border-2 border-gray-200 dark:border-gray-500"
+          hasComponentLayout
+          class="col-span-2 flex gap-2 border-2 border-gray-200 p-2 dark:border-gray-500"
         >
-          <CardBoxComponentHeader class="rounded-lg bg-sky-400" title="PHM" />
-          <div class="m-2 h-[100%]">
+          <CardBoxComponentHeader
+            class="rounded-lg border-b-2 bg-slate-200 text-xl dark:bg-slate-500"
+            title="PHM"
+          />
+          <div class="h-[100%]">
             <v-chart :option="option1" autoresize />
           </div>
         </CardBox>
         <CardBox
-          class="col-span-2 border-2 border-gray-200 dark:border-gray-500"
+          hasComponentLayout
+          class="col-span-2 flex gap-2 border-2 border-gray-200 p-2 dark:border-gray-500"
         >
-          <CardBoxComponentHeader class="rounded-lg bg-sky-400" title="CPO" />
-          <div class="m-2 h-[100%]">
+          <CardBoxComponentHeader
+            class="rounded-lg border-b-2 bg-slate-200 text-xl dark:bg-slate-500"
+            title="CPO"
+          />
+          <div class="h-[100%]">
             <v-chart :option="option2" autoresize />
           </div>
         </CardBox>
       </div>
 
       <CardBox
-        class="grid h-screen border-2 border-gray-200 dark:border-gray-500"
+        hasComponentLayout
+        class="flex h-screen gap-2 border-2 border-gray-200 p-2 dark:border-gray-500"
       >
-        <CardBoxComponentHeader class="rounded-lg bg-sky-400" title="Map" />
-        <div class="my-2 h-[92%] w-[100%]" id="map" ref="mapRef"></div>
+        <CardBoxComponentHeader
+          class="rounded-lg border-b-2 bg-slate-200 text-xl dark:bg-slate-500"
+          title="Map"
+        />
+        <div
+          class="h-[100%] w-auto overflow-hidden rounded-lg"
+          id="map"
+          ref="mapRef"
+        ></div>
       </CardBox>
     </div>
   </LayoutAuthenticated>
@@ -69,7 +88,8 @@ import CardBoxComponentBody from "@/components/CardBoxComponentBody.vue";
 import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
 import tt from "@tomtom-international/web-sdk-maps";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import { ref, onMounted } from "vue";
+import TomTomStyle from "@/style/tomtomstyle.json";
+import { ref, onMounted, provide } from "vue";
 import {
   mdiHeartPulse,
   mdiThermometer,
@@ -77,6 +97,9 @@ import {
   mdiEvStation,
   mdiCar,
 } from "@mdi/js";
+import { THEME_KEY } from "vue-echarts";
+
+provide(THEME_KEY, "dark");
 
 const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
 const mapRef = ref(null);
@@ -85,12 +108,14 @@ const option = ref({});
 const optionCarList = ref({});
 const option1 = ref({});
 const option2 = ref({});
+
 onMounted(() => {
   let map = tt.map({
     key: TOMTOMKEY,
     container: mapRef.value,
     zoom: 10,
     center: center,
+    style: TomTomStyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());
@@ -98,7 +123,9 @@ onMounted(() => {
   console.log(map.getBounds());
 
   window.map = map;
+
   optionCarList.value = {
+    backgroundColor: "transparent",
     tooltip: {
       trigger: "item",
     },
@@ -113,8 +140,8 @@ onMounted(() => {
       {
         name: "Access From",
         type: "pie",
-        center: ["70%", "30%"],
-        radius: "50%",
+        center: ["70%", "50%"],
+        radius: "90%",
         avoidLabelOverlap: false,
         label: {
           show: false,
@@ -132,7 +159,10 @@ onMounted(() => {
       },
     ],
   };
+
   option1.value = {
+    backgroundColor: "transparent",
+    darkMode: true,
     dataset: {
       source: [
         ["score", "amount", "product"],
@@ -159,105 +189,8 @@ onMounted(() => {
       },
     ],
   };
-
-  /*option.value = {
-    title: [
-      {
-        subtext: "10 drives",
-        left: "10%",
-        top: "60%",
-        textAlign: "center",
-      },
-      {
-        subtext: "11 drives",
-        left: "40%",
-        top: "60%",
-        textAlign: "center",
-      },
-      {
-        subtext: "6 drives",
-        left: "70%",
-        top: "60%",
-        textAlign: "center",
-      },
-    ],
-    dataset: [
-      {
-        source: [
-          ["Product", "Sales", "Price", "Year"],
-          ["Speeding", 10, 25, 2011],
-          ["", 90, 29, 2011],
-
-          ["Doze off", 11, 27, 2012],
-          ["", 89, 34, 2012],
-
-          ["Distracted", 6, 31, 2013],
-          ["", 94, 39, 2013],
-        ],
-      },
-      {
-        transform: {
-          type: "filter",
-          config: { dimension: "Year", value: 2011 },
-        },
-      },
-      {
-        transform: {
-          type: "filter",
-          config: { dimension: "Year", value: 2012 },
-        },
-      },
-      {
-        transform: {
-          type: "filter",
-          config: { dimension: "Year", value: 2013 },
-        },
-      },
-      {
-        transform: {
-          type: "filter",
-          config: { dimension: "Year", value: 2014 },
-        },
-      },
-    ],
-    series: [
-      {
-        title: {
-          text: "Referer of a Website",
-        },
-        type: "pie",
-        radius: ["18%", "22%"],
-        datasetIndex: 1,
-      },
-      {
-        type: "pie",
-
-        radius: ["18%", "22%"],
-
-        datasetIndex: 2,
-      },
-      {
-        type: "pie",
-        radius: ["18%", "22%"],
-
-        datasetIndex: 3,
-      },
-    ],
-    // Optional. Only for responsive layout:
-    media: [
-      {
-        query: { minAspectRatio: 1 },
-        option: {
-          series: [
-            { center: ["10%", "40%"] },
-            { center: ["40%", "40%"] },
-            { center: ["70%", "40%"] },
-          ],
-        },
-      },
-    ],
-  };*/
   option.value = {
+    backgroundColor: "transparent",
     title: [
       //first title/subtitle
       {
@@ -347,7 +280,7 @@ onMounted(() => {
         },
       },
     ],
-    color: ["#CE0000", "#F0F0F0"],
+    color: ["#CE0000", "#F0F0F0", "#CE0000", "#F0F0F0", "#CE0000", "#F0F0F0"],
     series: [
       //first cirlce
       {
@@ -444,6 +377,7 @@ onMounted(() => {
     ],
   };
   option2.value = {
+    backgroundColor: "transparent",
     xAxis: {
       type: "category",
       data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],

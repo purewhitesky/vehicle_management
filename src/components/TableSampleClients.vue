@@ -70,15 +70,14 @@ const pagesList = computed(() => {
         <th>VinID</th>
         <th>Mileage</th>
         <th>Position</th>
-        <th>Error Code</th>
         <th>Primary Cause</th>
         <th>Predicted Fix</th>
-        <th>Processing Progress</th>
+        <th>emergency level</th>
         <th />
       </tr>
     </thead>
     <tbody>
-      <tr v-for="itemsData in itemsPaginated" :key="itemsData.id">
+      <tr v-for="itemsData in itemsPaginated" :key="itemsData.VinID">
         <td data-label="Date" class="whitespace-nowrap lg:w-1">
           <small
             class="text-gray-500 dark:text-slate-400"
@@ -93,9 +92,7 @@ const pagesList = computed(() => {
         <td data-label="Position">
           {{ itemsData.Position }}
         </td>
-        <td data-label="Error Code">
-          {{ itemsData.ErrorCode }}
-        </td>
+
         <td data-label="Primary Cause">
           {{ itemsData.PrimaryCause }}
         </td>
@@ -103,7 +100,7 @@ const pagesList = computed(() => {
           {{ itemsData.PredictedFix }}
         </td>
 
-        <td data-label="Processing Progress" class="lg:w-32">
+        <td data-label="emergency level" class="lg:w-32">
           <progress
             class="flex w-2/5 self-center lg:w-full"
             max="100"

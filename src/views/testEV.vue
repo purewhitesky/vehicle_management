@@ -3,6 +3,7 @@ import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
+import TomTomStyle from "@/style/tomtomstyle.json";
 import * as turf from "@turf/turf";
 import BaseButton from "@/components/BaseButton.vue";
 import { ref, reactive, onMounted, computed } from "vue";
@@ -19,6 +20,7 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 13,
     center: center,
+    style: TomTomStyle,
   });
   let geolocateControl;
   map.addControl(new tt.FullscreenControl());
@@ -163,7 +165,7 @@ function iconElement(marker, index, iconlistNum, isOpen) {
 
   const buttonElement = document.createElement("button");
   buttonElement.textContent = "Navigation"; // 按鈕上的文字
-  buttonElement.className = "mt-2 w-full rounded-lg border-2"; // 添加類別
+  buttonElement.className = "mt-2 w-full rounded-lg border-2 "; // 添加類別
 
   // 綁定 click 事件的處理函式
   buttonElement.addEventListener("click", (event) => {
@@ -209,7 +211,7 @@ function iconElement(marker, index, iconlistNum, isOpen) {
   }
 
   const textElement = document.createElement("div");
-
+  textElement.className = "text-black";
   let chargData = "";
   marker.chargingPark.connectors.map((value, index) => {
     /*console.log(
@@ -251,7 +253,7 @@ const removeMarker = () => {
 </script>
 <template>
   <LayoutAuthenticated>
-    <div class="m-2">
+    <div class="m-6">
       <BaseButton
         class="w-full border-2 border-gray-200 dark:border-gray-500"
         label="View nearby charging stations"

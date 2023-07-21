@@ -54,7 +54,7 @@ const menuClick = (event, item) => {
   >
     <div
       :class="[layoutAsidePadding, { 'ml-60 lg:ml-0': isAsideMobileExpanded }]"
-      class="min-h-screen w-screen bg-gray-50 pt-14 transition-position dark:bg-slate-800 dark:text-slate-100 lg:w-auto"
+      class="min-h-screen w-screen bg-gray-50 pt-14 transition-position dark:bg-[#8D9D94] dark:text-slate-100 lg:w-auto"
     >
       <NavBar
         :menu="menuNavBar"
@@ -79,12 +79,7 @@ const menuClick = (event, item) => {
         >
           <BaseIcon :path="mdiMenu" size="24" />
         </NavBarItemPlain>
-        <div class="mt-3 flex">
-          <img
-            src="https://www.mih-ev.org/wp-content/themes/echo-wordpress-custom/mih/images/logo/MIH-consortium-logo_20210728.svg"
-            width="100"
-          />
-        </div>
+        <div class="mt-3 flex"></div>
       </NavBar>
       <AsideMenu
         :is-aside-mobile-expanded="isAsideMobileExpanded"

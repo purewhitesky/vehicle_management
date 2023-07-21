@@ -40,16 +40,21 @@ const asideLgCloseClick = (event) => {
   >
     <div
       :class="styleStore.asideStyle"
-      class="flex flex-1 flex-col overflow-hidden dark:bg-slate-900 lg:rounded-2xl"
+      class="flex flex-1 flex-col overflow-hidden dark:bg-[#333333] lg:rounded-2xl"
     >
       <div
         :class="styleStore.asideBrandStyle"
-        class="flex h-14 flex-row items-center justify-between dark:bg-slate-900"
+        class="flex h-20 flex-row items-center justify-between dark:bg-[#333333]"
       >
         <div
-          class="flex-1 text-center lg:pl-6 lg:text-left xl:pl-0 xl:text-center"
+          class="mt-3 flex flex-1 flex-col text-center lg:pl-6 lg:text-left xl:pl-0 xl:text-center"
         >
-          <b class="font-black">Meun</b>
+          <!--MIH LOGO SETTING-->
+          <img
+            src="https://www.mih-ev.org/wp-content/themes/echo-wordpress-custom/mih/images/logo/MIH-consortium-logo_20210728.svg"
+            width="120"
+            class="self-center"
+          />
         </div>
         <button
           class="hidden p-3 lg:inline-block xl:hidden"

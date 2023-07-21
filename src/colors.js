@@ -5,7 +5,7 @@ export const gradientBgPinkRed = `${gradientBgBase} from-pink-400 via-red-500 to
 
 export const colorsBgLight = {
   white: "bg-white text-black",
-  light: "bg-white text-black dark:bg-slate-900/70 dark:text-white",
+  light: "bg-white text-black dark:bg-[#333333]/70 dark:text-white",
   contrast: "bg-gray-800 text-white dark:bg-white dark:text-black",
   success: "bg-emerald-500 border-emerald-500 text-white",
   danger: "bg-red-500 border-red-500 text-white",
@@ -52,7 +52,7 @@ export const getButtonColor = (
     },
     active: {
       white: "bg-gray-100",
-      whiteDark: "bg-gray-100 dark:bg-slate-800",
+      whiteDark: "bg-gray-100 dark:bg-[#8D9D94]",
       lightDark: "bg-gray-200 dark:bg-slate-700",
       contrast: "bg-gray-700 dark:bg-slate-100",
       success: "bg-emerald-700 dark:bg-emerald-600",
@@ -62,8 +62,8 @@ export const getButtonColor = (
     },
     bg: {
       white: "bg-white text-black",
-      whiteDark: "bg-white text-black dark:bg-slate-900 dark:text-white",
-      lightDark: "bg-gray-100 text-black dark:bg-slate-800 dark:text-white",
+      whiteDark: "bg-white text-black dark:bg-[#333333] dark:text-white",
+      lightDark: "bg-gray-100 text-black dark:bg-[#8D9D94] dark:text-white",
       contrast: "bg-gray-800 text-white dark:bg-white dark:text-black",
       success: "bg-emerald-600 dark:bg-emerald-500 text-white",
       danger: "bg-red-600 dark:bg-red-500 text-white",
@@ -72,7 +72,7 @@ export const getButtonColor = (
     },
     bgHover: {
       white: "hover:bg-gray-100",
-      whiteDark: "hover:bg-gray-100 hover:dark:bg-slate-800",
+      whiteDark: "hover:bg-gray-100 hover:dark:bg-[#8D9D94]",
       lightDark: "hover:bg-gray-200 hover:dark:bg-slate-700",
       contrast: "hover:bg-gray-700 hover:dark:bg-slate-100",
       success:
@@ -156,7 +156,7 @@ export const getCarButtonColor = (
     },
     active: {
       white: "bg-gray-100",
-      whiteDark: "bg-gray-100 dark:bg-slate-800",
+      whiteDark: "bg-gray-100 dark:bg-[#8D9D94]",
       lightDark: "bg-gray-300 dark:bg-slate-400",
       contrast: "bg-gray-700 dark:bg-slate-100",
       success: "bg-emerald-700 dark:bg-emerald-600",
@@ -166,8 +166,8 @@ export const getCarButtonColor = (
     },
     bg: {
       white: "bg-white text-black",
-      whiteDark: "bg-white text-black dark:bg-slate-900 dark:text-white",
-      lightDark: "bg-gray-100 text-black dark:bg-slate-800 dark:text-white",
+      whiteDark: "bg-white text-black dark:bg-[#333333] dark:text-white",
+      lightDark: "bg-gray-100 text-black dark:bg-[#8D9D94] dark:text-white",
       contrast: "bg-gray-800 text-white dark:bg-white dark:text-black",
       success: "bg-emerald-600 dark:bg-emerald-500 text-white",
       danger: "bg-red-600 dark:bg-red-500 text-white",
@@ -176,7 +176,7 @@ export const getCarButtonColor = (
     },
     bgHover: {
       white: "hover:bg-gray-100",
-      whiteDark: "hover:bg-gray-100 hover:dark:bg-slate-800",
+      whiteDark: "hover:bg-gray-100 hover:dark:bg-[#8D9D94]",
       lightDark: "hover:bg-gray-200 hover:dark:bg-slate-700",
       contrast: "hover:bg-gray-700 hover:dark:bg-slate-100",
       success:

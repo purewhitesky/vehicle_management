@@ -1,12 +1,12 @@
 <template>
   <LayoutAuthenticated>
-    <SectionMain>
+    <div class="m-2">
       <SectionTitleLineWithButton :icon="mdiCarWrench" title="FleetRepair" main>
       </SectionTitleLineWithButton>
       <CardBox class="mb-6" has-table>
         <TableSampleClients checkable />
       </CardBox>
-    </SectionMain>
+    </div>
   </LayoutAuthenticated>
 </template>
 

@@ -88,7 +88,7 @@ const checked = (isChecked, client) => {
     <p>This is sample modal</p>
   </CardBoxModal>
 
-  <div v-if="checkedRows.length" class="bg-gray-100/50 p-3 dark:bg-slate-800">
+  <div v-if="checkedRows.length" class="bg-gray-100/50 p-3 dark:bg-[#8D9D94]">
     <span
       v-for="checkedRow in checkedRows"
       :key="checkedRow.id"

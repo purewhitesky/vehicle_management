@@ -15,7 +15,7 @@ const props = defineProps({
 const componentClass = computed(() => {
   const base = [
     props.rounded,
-    props.isModal ? "dark:bg-slate-900" : "dark:bg-slate-900/70",
+    props.isModal ? "dark:bg-[#333333]" : "dark:bg-[#333333]/70",
     props.isCenter ? "items-center justify-items-center" : "",
   ];
   return base;

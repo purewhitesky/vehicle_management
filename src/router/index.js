@@ -164,6 +164,14 @@ const routes = [
   },
   {
     meta: {
+      title: "RouteItinerary",
+    },
+    path: "/RouteItinerary", //報錯顯示404頁面
+    name: "RouteItinerary",
+    component: () => import("@/views/RouteItinerary.vue"),
+  },
+  {
+    meta: {
       title: "Register",
     },
     path: "/Register", //報錯顯示404頁面

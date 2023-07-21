@@ -86,7 +86,7 @@ const menuClick = (event) => {
       :menu="item.menu"
       :class="[
         styleStore.asideMenuDropdownStyle,
-        isDropdownActive ? 'block dark:bg-slate-800/50' : 'hidden',
+        isDropdownActive ? 'block dark:bg-[#8D9D94]/50' : 'hidden',
       ]"
       is-dropdown-list
     />

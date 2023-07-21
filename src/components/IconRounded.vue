@@ -33,7 +33,7 @@ defineProps({
     :class="
       bg
         ? colorsBgLight[color]
-        : [colorsText[color], 'bg-gray-50 dark:bg-slate-800']
+        : [colorsText[color], 'bg-gray-50 dark:bg-[#8D9D94]']
     "
   />
 </template>

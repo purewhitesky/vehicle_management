@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import {
   apiAddnewfencetoaproject,
   apiWaypointOptimization,
@@ -12,7 +12,7 @@ import {
 } from "@/api/apiTomtom";
 import { getTomTomAlert } from "@/api/obd_alwayshow";
 import {
-  mdiMapMarkerRadiusOutline,
+  mdiMapMarker,
   mdiTruck,
   mdiAlert,
   mdiCarBack,
@@ -22,6 +22,7 @@ import * as turf from "@turf/turf";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
+import TomTomStyle from "@/style/tomtomstyle.json";
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 import BaseButton from "@/components/BaseButton.vue";
@@ -69,13 +70,16 @@ const js = ref({
 });
 //console.log(js.value.body);
 const MapGPS = ref();
+const listClick = ref(false);
 onMounted(() => {
   let map = tt.map({
     key: TOMTOMKEY,
     container: mapRef.value,
     zoom: 13,
     center: center,
+    style: TomTomStyle,
   });
+
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());
   map.addControl(
@@ -87,19 +91,15 @@ onMounted(() => {
     }))
   );
   console.log(MapGPS.value);
-  /*MapGPS.value.on((event) => {
-    console.log(event);
-  });*/
-  /*map.on("data", (event) => {
-    console.log(event);
-  });*/
   map.on("click", (event) => {
     //Listprojects()
+    listClick.value = !listClick.value;
     console.log(event.lngLat);
     //觸發測試
     //getReport(event.lngLat.lng, event.lngLat.lat);
   });
   window.map = map;
+  addressData(); //啟動
 });
 onUnmounted(() => {
   clearInterval(intervalId);
@@ -138,6 +138,7 @@ const WaypointOptimization = (data) => {
     },
   }).then((res) => {
     console.log(res);
+    Waypoint(res.data.optimizedOrder);
     res.data.optimizedOrder.forEach((placeName, placeIndex) => {
       console.log(data[placeName]);
       address1.value[placeIndex] = data[placeName].point;
@@ -210,7 +211,9 @@ const route = (data) => {
             data: features,
           },
           paint: {
-            "line-width": 3,
+            "line-color": "#0088f0",
+            "line-width": 4,
+
             "line-opacity": 0.5,
           },
         });
@@ -220,7 +223,7 @@ const route = (data) => {
 //=====================================================
 //圍欄註冊
 const Addnewfencetoaproject = (data, lng, lat, counter = 0) => {
-  const retryTimes = 5;
+  const retryTimes = 10;
   apiAddnewfencetoaproject(
     `ba848e64-c5d1-4190-9d41-2762966ac6f5`,
     `lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes`,
@@ -275,7 +278,7 @@ const alertUse = () => {
       let transitionType = alertData.value.contextData.transitionType;
       let objectId = alertData.value.contextData.objectName;
       let fenceName = alertData.value.contextData.fenceName;
-      fenceName = fenceName.replace(",台北市南港區", "");
+      fenceName = fenceName.replace(",台北市", "");
 
       let time = res.data.contextData.estimatedTransitionTime;
 
@@ -345,7 +348,7 @@ intervalId = window.setInterval(() => {
       GPSCount.value = 0;
       GPSNumber.value = [];
     }
-    let firstGPS = 550;
+    let firstGPS = 450;
     if (placePoint.value == 0 && GPSCount.value == 0) {
       GPSCount.value = firstGPS;
     }
@@ -353,6 +356,7 @@ intervalId = window.setInterval(() => {
     let GPSlng = saveRoadPoint.value[placePoint.value][GPSCount.value][0];
     let GPSlat = saveRoadPoint.value[placePoint.value][GPSCount.value][1];
     let GPSColor = saveRoadPoint.value[placePoint.value][GPSCount.value][2];
+
     GPSNumber.value[GPSCount.value] = new tt.Marker({
       element: iconSytle(mdiCarBack, iconColor(GPSColor)),
     })
@@ -499,7 +503,7 @@ const marker = (lngData, latData, index) => {
   );
   //==========
   addressNumber.value[index] = new tt.Marker({
-    element: iconSytle(mdiMapMarkerRadiusOutline),
+    element: iconSytle(mdiMapMarker, "#c00000"),
   })
     .setLngLat({ lat: latData, lng: lngData })
     .addTo(window.map);
@@ -513,18 +517,7 @@ const routeNameData = (data) => {
     routeNameDataArr.value[index] = {
       query: `${value}`,
       bestResult: true,
-    }; /*
-    if (value == "林口物流中心") {
-      routeNameDataArr.value[index] = {
-        query: `${value}`,
-        bestResult: true,
-      };
-    } else {
-      routeNameDataArr.value[index] = {
-        query: `${value},台北市南港區`,
-        bestResult: true,
-      };
-    }*/
+    };
   });
   //console.log(routeNameDataArr.value);
 };
@@ -570,12 +563,11 @@ const Listthefencesforagivenproject = (data) => {
         Getfencedetails(value.id);
       })
     );
-    //Getfencedetails(ListfencesData.value[0].id);
   });
 };
 const defaultOptions = {
   style: {
-    stroke: true,
+    stroke: false,
     color: "#61ade0",
     opacity: 0.8,
     fillOpacity: 0.2,
@@ -586,7 +578,7 @@ const defaultOptions = {
   },
 };
 const Getfencedetails = (fencesData, counter = 0) => {
-  const retryTimes = 5;
+  const retryTimes = 10;
   apiGetfencedetails(fencesData)
     .then((res) => {
       console.log(res);
@@ -629,7 +621,6 @@ const Getfencedetails = (fencesData, counter = 0) => {
       });
     })
     .catch((err) => {
-      //console.log(err.response.status);
       if (
         (err.response.status == 403 || err.response.status == 429) &&
         counter < retryTimes
@@ -643,66 +634,82 @@ const Getfencedetails = (fencesData, counter = 0) => {
       }
     });
 };
+const VINID = ref("XXX-XXXX");
+const Optimization = ref([]);
+const Waypoint = (WaypointOptimizationData) => {
+  WaypointOptimizationData.map((value, index) => {
+    Optimization.value[index] = routeData.value[value];
+  });
+};
 </script>
 
 <template>
   <LayoutAuthenticated>
-    <div class="m-2">
-      <BaseButtons>
-        <BaseButton
-          class="grid border-2 border-gray-200 dark:border-gray-500"
-          label="Show Itinerary"
-          @click="addressData()"
-        ></BaseButton>
-        <!--
-
-        
-        <BaseButton
-          class="grid border-2 border-gray-200 dark:border-gray-500"
-          label="Show Fence"
-          @click="Listprojects()"
-        ></BaseButton>
-        
-        <BaseButton
-          class="grid border-2 border-gray-200 dark:border-gray-500"
-          label="Show objects"
-          @click="Listobjects()"
-        ></BaseButton>
-        -->
-      </BaseButtons>
-      <div class="mt-2 grid h-[75vh] grid-cols-5 gap-2">
+    <div class="m-6">
+      <div class="mt-1 flex h-[90vh] w-auto gap-1">
         <CardBox
-          class="col-span-4 border-2 border-gray-200 dark:border-gray-500"
+          class="relative w-[100%] border-2 border-gray-200 dark:border-gray-500"
         >
           <div
-            class="h-[100%] w-auto lg:h-[100%] lg:w-[100%]"
+            class="h-[100%] overflow-hidden rounded-lg"
             id="map"
             ref="mapRef"
           ></div>
-        </CardBox>
-        <CardBox
-          class="overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
-        >
-          <CardBoxComponentTitle title="Alert Event" main class="border-b-2">
-          </CardBoxComponentTitle>
-          <div
-            class="mt-2 grid gap-2 rounded-lg border-2 text-center"
-            v-for="(item, index) in alretArr"
+          <CardBox
+            class="absolute right-10 bottom-[5%] h-[40%] w-[23%] overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
           >
-            <div class="flex border-b-2 text-left text-red-400">
-              <BaseIcon
-                :path="mdiBellAlert"
-                size="16"
-                class="m-2 text-red-400"
-              />
-              <div class="flex place-items-center">
-                {{ item.transitionType }}
+            <CardBoxComponentTitle
+              title="Notification"
+              main
+              class="border-b-2 border-slate-400"
+            >
+            </CardBoxComponentTitle>
+            <div
+              class="grid rounded-lg text-center"
+              v-for="(item, index) in alretArr"
+            >
+              <div class="mt-4 flex border-b-2 text-left text-red-400">
+                <div class="mx-2 flex w-[15%] items-center">
+                  <BaseIcon
+                    :path="mdiBellAlert"
+                    class="m-1 w-[10vh] items-center rounded-full bg-red-200 text-red-400"
+                  />
+                </div>
+
+                <div class="mx-2 flex w-[100%] items-center">
+                  <div class="flex-1 text-left">
+                    {{ item.transitionType }}
+                  </div>
+                  <div class="text-right text-slate-400">{{ item.time }}</div>
+                </div>
+              </div>
+              <div class="flex w-[100%] justify-between">
+                <div class="">
+                  {{ item.objectId }}
+                </div>
+                <div class="">{{ item.fenceName }}</div>
               </div>
             </div>
-            <div>{{ item.objectId }}</div>
-            <div>{{ item.fenceName }}</div>
-            <div>{{ item.time }}</div>
-          </div>
+          </CardBox>
+          <template v-if="listClick">
+            <CardBox
+              class="absolute left-10 bottom-[5%] h-[90%] w-[23%] overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
+            >
+              <CardBoxComponentTitle
+                :title="VINID"
+                main
+                class="border-b-2 border-slate-400"
+              ></CardBoxComponentTitle>
+
+              <div
+                class="grid rounded-lg text-left"
+                v-for="(item, index) in Optimization"
+              >
+                <div class="font-semibold">{{ item }}</div>
+                <div>|</div>
+              </div>
+            </CardBox>
+          </template>
         </CardBox>
       </div>
     </div>
