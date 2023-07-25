@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref, reactive, onMounted } from "vue";
 import { useMainStore } from "@/stores/main";
+import { getUserAPI, getDTC } from "@/api/obd_alwayshow";
+import { fix } from "@/api/apiGraphen";
 import BaseLevel from "@/components/BaseLevel.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import BaseButton from "@/components/BaseButton.vue";
@@ -11,33 +13,115 @@ defineProps({
   checkable: Boolean,
 });
 const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
-const mainStore = useMainStore();
+const PermissionsID = { ID: "1" }; //最高管理權限
 
-const posArray = reactive([]);
-
-repairData.data.forEach((pos, index) => {
-  posArray.push({ position: repairData.data[index].Position });
+const repairData1 = ref([]);
+const posArray1 = reactive([]);
+const jsonData = ref({
+  Date: "",
+  VinID: "",
+  Mileage: "",
+  Position: {
+    lat: "",
+    lng: "",
+  },
+  PendingDTC: "",
+  PrimaryDTC: "",
+  SecondaryDTC: "",
+  PrimaryCause: "",
+  PredictedFix: "",
+  Emergency: "",
 });
-tts.services
-  .reverseGeocode({
-    language: "en-US",
-    batchMode: "sync",
-    key: TOMTOMKEY,
-    batchItems: posArray,
-  })
-  .then((res) => {
-    res.batchItems.forEach((data, index) => {
-      console.log(res.batchItems[index].addresses[0].address.freeformAddress);
-      repairData.data[index].Position =
-        res.batchItems[index].addresses[0].address.freeformAddress;
-      console.log(repairData.data);
+const fixData = ref({
+  "Primary DTC": "",
+  "Secondary DTC": "",
+  "Pending DTC": "",
+  username: "york",
+  password: "graphen4york",
+});
+
+const DTCData = async () => {
+  let carList;
+  await getUserAPI(PermissionsID).then((res) => {
+    carList = res.data.car_list;
+  });
+
+  for (const value of carList) {
+    await getDTC(value.VIN_ID).then((res) => {
+      if (res.data.message != "NOT FOUND") {
+        jsonData.value = {
+          Date: res.data.Timestamp,
+          VinID: res.data.VIN_ID,
+          Mileage: res.data.VSS.DTC.Mileage,
+          Position: {
+            lat: res.data.VSS.DTC.Latitude,
+            lng: res.data.VSS.DTC.Longitude,
+          },
+          PendingDTC: res.data.VSS.DTC.PendingDTC,
+          PrimaryDTC: res.data.VSS.DTC.PrimaryDTC,
+          SecondaryDTC: res.data.VSS.DTC.SecondaryDTC,
+          PrimaryCause: "",
+          PredictedFix: "",
+          Emergency: res.data.VSS.DTC.Emergency,
+        };
+        repairData1.value.push(jsonData.value);
+        posArray1.push({
+          position: {
+            lat: res.data.VSS.DTC.Latitude,
+            lng: res.data.VSS.DTC.Longitude,
+          },
+        });
+      }
+    });
+  }
+  tts.services
+    .reverseGeocode({
+      language: "en-US",
+      batchMode: "sync",
+      key: TOMTOMKEY,
+      batchItems: posArray1,
+    })
+    .then((res) => {
+      res.batchItems.forEach((data, index) => {
+        repairData1.value[index].Position =
+          res.batchItems[index].addresses[0].address.freeformAddress;
+      });
+    });
+  console.log(repairData1.value);
+  repairData1.value.forEach((fixValue, index) => {
+    fixData.value = {
+      "Primary DTC": fixValue.PrimaryDTC,
+      "Secondary DTC": fixValue.SecondaryDTC,
+      "Pending DTC": fixValue.PendingDTC,
+      username: "york",
+      password: "graphen4york",
+    };
+    fix(fixData.value).then((res) => {
+      console.log(res.data);
+      repairData1.value[index].PrimaryCause = res.data.Definitions;
+      repairData1.value[index].PredictedFix = res.data.Fix;
     });
   });
-const items = computed(() => repairData.data);
+};
 
-const isModalActive = ref(false);
+const change = (data) => {
+  switch (data) {
+    case "Red":
+      return "red";
+    case "Yellow":
+      return "yellow";
+    default:
+      return "gray";
+  }
+};
 
-const perPage = ref(7); //超過5換頁
+onMounted(() => {
+  DTCData();
+});
+
+const items = computed(() => repairData1.value);
+
+const perPage = ref(10); //超過5換頁
 
 const currentPage = ref(0);
 
@@ -77,7 +161,7 @@ const pagesList = computed(() => {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="itemsData in itemsPaginated" :key="itemsData.VinID">
+      <tr v-for="(itemsData, index) in itemsPaginated" :key="itemsData.VinID">
         <td data-label="Date" class="whitespace-nowrap lg:w-1">
           <small
             class="text-gray-500 dark:text-slate-400"
@@ -94,20 +178,20 @@ const pagesList = computed(() => {
         </td>
 
         <td data-label="Primary Cause">
-          {{ itemsData.PrimaryCause }}
+          <li v-for="(value, key) in itemsData.PrimaryCause" :key="key">
+            {{ value }}
+          </li>
         </td>
         <td data-label="Predicted Fix">
           {{ itemsData.PredictedFix }}
         </td>
-
-        <td data-label="emergency level" class="lg:w-32">
-          <progress
-            class="flex w-2/5 self-center lg:w-full"
-            max="100"
-            :value="itemsData.ProcessingProgress"
-          >
-            {{ itemsData.progress }}
-          </progress>
+        <td data-label="emergency level">
+          <div class="lg:flex lg:flex-1 lg:justify-center">
+            <div
+              class="h-10 w-10 rounded-full"
+              :class="change(itemsData.Emergency)"
+            ></div>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -129,3 +213,17 @@ const pagesList = computed(() => {
     </BaseLevel>
   </div>
 </template>
+<style>
+.red {
+  --tw-bg-opacity: 1;
+  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
+}
+.yellow {
+  --tw-bg-opacity: 1;
+  background-color: rgb(250 204 21 / var(--tw-bg-opacity));
+}
+.gray {
+  --tw-bg-opacity: 1;
+  background-color: rgb(156 163 175 / var(--tw-border-opacity));
+}
+</style>
