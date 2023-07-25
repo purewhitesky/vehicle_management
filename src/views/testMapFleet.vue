@@ -348,7 +348,7 @@ intervalId = window.setInterval(() => {
       GPSCount.value = 0;
       GPSNumber.value = [];
     }
-    let firstGPS = 450;
+    let firstGPS = 400;
     if (placePoint.value == 0 && GPSCount.value == 0) {
       GPSCount.value = firstGPS;
     }
@@ -634,7 +634,7 @@ const Getfencedetails = (fencesData, counter = 0) => {
       }
     });
 };
-const VINID = ref("XXX-XXXX");
+const VINID = ref("MIH-0001");
 const Optimization = ref([]);
 const Waypoint = (WaypointOptimizationData) => {
   WaypointOptimizationData.map((value, index) => {

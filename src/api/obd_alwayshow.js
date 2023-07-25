@@ -56,3 +56,6 @@ export const getUserAPI = (param) =>
   MIHapi.get(`/api/get/car`, { params: param });
 
 export const getTomTomAlert = () => MIHapi.get(`/api/geofence`);
+
+export const getDTC = (ID) =>
+  MIHapi.get(`api/get/dtc`, { params: { VINID: ID } });
