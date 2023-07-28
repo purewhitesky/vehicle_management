@@ -1,12 +1,10 @@
 <script setup>
 import { computed, ref, reactive, onMounted } from "vue";
-import { useMainStore } from "@/stores/main";
 import { getUserAPI, getDTC } from "@/api/obd_alwayshow";
 import { fix } from "@/api/apiGraphen";
 import BaseLevel from "@/components/BaseLevel.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import BaseButton from "@/components/BaseButton.vue";
-import repairData from "../../public/data-sources/repairData.json";
 import tts from "@tomtom-international/web-sdk-services";
 
 defineProps({
@@ -36,8 +34,16 @@ const fixData = ref({
   "Primary DTC": "",
   "Secondary DTC": "",
   "Pending DTC": "",
-  username: "york",
+});
+const testData = ref({
+  "Pending DTC": ["P0353"],
+  "Primary DTC": "",
+  "Secondary DTC": ["P0353"],
   password: "graphen4york",
+  username: "york",
+});
+fix(testData.value).then((res) => {
+  console.log(res);
 });
 
 const DTCData = async () => {
@@ -186,7 +192,7 @@ const pagesList = computed(() => {
           {{ itemsData.PredictedFix }}
         </td>
         <td data-label="emergency level">
-          <div class="lg:flex lg:flex-1 lg:justify-center">
+          <div class="justify-center lg:flex lg:flex-1">
             <div
               class="h-10 w-10 rounded-full"
               :class="change(itemsData.Emergency)"

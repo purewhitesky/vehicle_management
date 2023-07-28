@@ -1,5 +1,5 @@
 <template>
-  <LayoutAuthenticated>
+  <LayoutAuthenticated class="h-screen">
     <SectionTitleLineWithButton
       class="mx-6"
       :icon="mdiCar"
@@ -7,8 +7,8 @@
       main
     >
     </SectionTitleLineWithButton>
-    <div class="m-6 grid grid-cols-2 gap-1">
-      <div class="grid h-screen grid-cols-2 grid-rows-3 gap-1">
+    <div class="m-6 grid h-screen grid-cols-2 gap-1">
+      <div class="grid grid-cols-2 grid-rows-3 gap-1">
         <CardBox
           hasComponentLayout
           class="flex gap-2 border-2 border-gray-200 p-2 dark:border-gray-500"
@@ -63,7 +63,7 @@
 
       <CardBox
         hasComponentLayout
-        class="flex h-screen gap-2 border-2 border-gray-200 p-2 dark:border-gray-500"
+        class="flex gap-2 border-2 border-gray-200 p-2 dark:border-gray-500"
       >
         <CardBoxComponentHeader
           class="rounded-lg border-b-2 bg-slate-200 text-xl dark:bg-slate-500"
