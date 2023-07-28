@@ -89,9 +89,11 @@ const menuClick = (event, item) => {
         @aside-lg-close-click="isAsideLgActive = false"
       />
       <slot />
-      <FooterBar>
-        <!--放置頁尾-->
-      </FooterBar>
+      <!--
+        <FooterBar>
+          
+        </FooterBar>
+      -->
     </div>
   </div>
 </template>
