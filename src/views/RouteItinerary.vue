@@ -166,8 +166,13 @@ const DeleteItineray = (index) => {
 };
 
 const routeData = ref([]);
+const open = ref(0);
 const checkAddData = (addData) => {
   removeMarker(markerNumber.value);
+  if (open.value > 0) {
+    removeRoute(routeName.value);
+  }
+
   isSearchOpen.value = false;
   let lat = 0;
   let lng = 0;
@@ -191,6 +196,7 @@ const checkAddData = (addData) => {
     lng: lng,
   });
   WaypointOptimization(routeData.value);
+  open.value++;
 };
 
 //=====================================================
@@ -227,6 +233,7 @@ const WaypointOptimization = (data) => {
 
 //=====================================================
 //路徑生成
+const routeName = ref();
 const route = (data) => {
   let roadline = "";
   tts.services
@@ -236,9 +243,9 @@ const route = (data) => {
     })
     .then(function (res) {
       roadline = res.toGeoJson().features;
-
       roadline.forEach((features, index) => {
-        //console.log(features);
+        console.log(features);
+        console.log(index);
         window.map.addLayer({
           id: "route" + index,
           type: "line",
@@ -253,7 +260,23 @@ const route = (data) => {
           },
         });
       });
+      console.log(roadline.length);
+      routeName.value = roadline.length;
     });
+};
+
+const removeRoute = (RouteArr) => {
+  console.log(RouteArr);
+  for (let i = 0; i < RouteArr; i++) {
+    window.map.removeLayer(`route${i}`);
+    window.map.removeSource(`route${i}`);
+  }
+  /*RouteArr.forEach((value, index) => {
+    window.map.removeLayer(`route${index}`);
+    window.map.removeSource(`route${index}`);
+    console.log(i);
+  });
+  console.log("removeOK");*/
 };
 
 //=====================================================
@@ -331,5 +354,6 @@ const removeMarker = (markerArr) => {
   });
   console.log(markerArr);
 };
+
 //=====================================================
 </script>
