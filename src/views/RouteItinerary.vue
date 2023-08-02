@@ -24,21 +24,26 @@
           class="absolute left-10 top-[14%] h-auto max-h-[80%] w-[20%] overflow-y-scroll aside-scrollbars-light"
         >
           <div class="m-2">
-            <div v-for="(item, index) in searchData">
+            <div v-for="(item, index) in searchSeeData">
               <div
-                class="m-2 flex h-[100px] items-center gap-2 border-t-2 border-[#333333] px-2"
+                class="m-2 flex min-h-[100px] items-center gap-2 border-t-2 border-[#333333] px-2 py-4"
               >
                 <div class="">
                   <BaseButton
                     color="#333333"
                     :icon="mdiPlusBox"
-                    iconSize="auto"
-                    @click="AddItineray(index)"
+                    iconSize="30"
+                    @click="addItineray(index)"
                     class="hover:border-green-500 hover:text-green-500"
                   ></BaseButton>
                 </div>
-                <div>
-                  {{ item.address.freeformAddress }}
+                <div class="flex flex-col">
+                  <div class="flex text-2xl">
+                    {{ item.poi }}
+                  </div>
+                  <div class="flex text-gray-400">
+                    {{ item.address }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -54,14 +59,22 @@
               title="Itineraty"
               main
               class="border-b-2 border-slate-400"
-              ><BaseButton
+            >
+              <BaseButton
+                color="#333333"
+                :icon="mdiEye"
+                iconSize="30"
+                @click="checkItineray(addData)"
+                class="hover:border-green-500 hover:text-green-500"
+              ></BaseButton>
+              <BaseButton
                 color="#333333"
                 :icon="mdiCheck"
-                iconSize="auto"
-                @click="checkAddData(addData)"
+                iconSize="30"
+                @click="setItineray(addData)"
                 class="hover:border-green-500 hover:text-green-500"
-              ></BaseButton
-            ></CardBoxComponentTitle>
+              ></BaseButton>
+            </CardBoxComponentTitle>
 
             <div v-for="(item, index) in addData">
               <div
@@ -70,13 +83,13 @@
                 <BaseButton
                   color="#333333"
                   :icon="mdiMinus"
-                  iconSize="auto"
-                  @click="DeleteItineray(index)"
+                  iconSize="30"
+                  @click="deleteItineray(index)"
                   class="hover:border-red-500 hover:text-red-500"
                 ></BaseButton>
                 <div>{{ index + 1 }}</div>
                 :
-                <div>{{ item.address.freeformAddress }}</div>
+                <div>{{ item.name }}</div>
               </div>
             </div>
           </div>
@@ -98,7 +111,7 @@ import "@tomtom-international/web-sdk-plugin-searchbox/dist/SearchBox.css";
 
 import TomTomStyle from "@/style/tomtomstyle.json";
 import { ref, reactive, onMounted, computed, watch } from "vue";
-import { mdiPlusBox, mdiMapMarker, mdiCheck, mdiMinus } from "@mdi/js";
+import { mdiPlusBox, mdiMapMarker, mdiEye, mdiCheck, mdiMinus } from "@mdi/js";
 import { apiWaypointOptimization } from "@/api/apiTomtom";
 
 const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
@@ -119,10 +132,20 @@ onMounted(() => {
   window.map = map;
 });
 
-const searchText = ref("");
+const searchText = ref();
 const searchData = ref([]);
+const searchSeeData = ref([]);
+/*{
+  name:"",
+  poi: "",
+  address: "",
+  position: "",
+} */
+
 const isSearchOpen = ref(false);
 const isItineratyOpen = ref(false);
+const isRemoveOpen = ref(false);
+
 const addressData = (data) => {
   tts.services
     .fuzzySearch({
@@ -132,11 +155,34 @@ const addressData = (data) => {
     .then((res) => {
       console.log(res);
       if (res.summary.numResults != "0") {
-        searchData.value = res.results; //模糊搜索結果
+        //初始化
+        searchSeeData.value = [];
+        //移除
+        isRemoveOpen.value
+          ? !isRemoveOpen.value
+          : removeMarker(markerNumber.value);
 
-        isRemove.value ? !isRemove.value : removeMarker(markerNumber.value);
+        searchData.value = res.results; //模糊搜索結果
         res.results.forEach((value, index) => {
-          marker(value.position.lng, value.position.lat, index);
+          if (value.poi != undefined) {
+            searchSeeData.value[index] = {
+              name: value.poi.name,
+              poi: value.poi.name,
+              address: value.address.freeformAddress,
+              position: value.position,
+            };
+          } else {
+            searchSeeData.value[index] = {
+              name: value.address.freeformAddress,
+              poi: "",
+              address: value.address.freeformAddress,
+              position: value.position,
+            };
+          }
+        });
+
+        res.results.forEach((value, index) => {
+          setMarker(value.position.lng, value.position.lat, index);
         });
       } else {
         searchData.value = res.results;
@@ -144,39 +190,41 @@ const addressData = (data) => {
     });
 };
 
-const isRemove = ref(false);
 watch(searchText, () => {
   console.log(searchText.value.length);
   if (searchText.value.length >= 2) {
     addressData(searchText.value);
     isSearchOpen.value = true;
   } else {
+    removeMarker(markerNumber.value);
     isSearchOpen.value = false;
   }
 });
 
 const addData = ref([]);
-const AddItineray = (index) => {
+const addItineray = (index) => {
   isItineratyOpen.value = true;
-  addData.value.push(searchData.value[index]);
-  console.log(searchData.value[index]);
+  addData.value.push(searchSeeData.value[index]);
 };
-const DeleteItineray = (index) => {
+
+const deleteItineray = (index) => {
   addData.value.splice(index, 1);
+  console.log(addData.value);
 };
 
+const isCheckOpen = ref(false);
 const routeData = ref([]);
-const open = ref(0);
-const checkAddData = (addData) => {
+const checkItineray = (setAddData) => {
+  //初始化
+  isCheckOpen.value = true;
+  routeData.value = [];
+  //
   removeMarker(markerNumber.value);
-  if (open.value > 0) {
-    removeRoute(routeName.value);
-  }
-
+  isRemoveOpen.value ? !isRemoveOpen.value : removeRoute(routeName.value);
   isSearchOpen.value = false;
   let lat = 0;
   let lng = 0;
-  addData.forEach((data, index) => {
+  setAddData.forEach((data, index) => {
     routeData.value[index] = {
       point: {
         longitude: data.position.lng,
@@ -186,8 +234,8 @@ const checkAddData = (addData) => {
     lat += data.position.lat;
     lng += data.position.lng;
   });
-  lat /= addData.length; //計算路經中心點
-  lng /= addData.length; //計算路經中心點
+  lat /= setAddData.length; //計算路經中心點
+  lng /= setAddData.length; //計算路經中心點
   console.log(lat, lng);
 
   //設定路徑中心點
@@ -196,7 +244,65 @@ const checkAddData = (addData) => {
     lng: lng,
   });
   WaypointOptimization(routeData.value);
-  open.value++;
+};
+
+const saveItinerayData = ref({
+  VINID: "",
+  verifyID: "",
+  carID: "",
+  date: "",
+  itineratyName: "",
+  itineraty: [],
+});
+/*
+{
+  VINID:""
+  verifyID:"",
+  carID:"",
+  date:"",
+  itineraty:[{
+      name:"",
+      poi:"",
+      address:"",
+      position:{
+        lng:"",
+        lat:"",
+      },
+    },
+  }]
+}
+*/
+function Itineraty(addData) {
+  console.log(addData);
+  addData.forEach((data, index) => {
+    if (data.poi != "") {
+      saveItinerayData.value.itineraty.push({
+        name: data.poi,
+        poi: data.poi,
+        address: data.address,
+        position: data.position,
+      });
+    } else {
+      saveItinerayData.value.itineraty.push({
+        name: data.address,
+        poi: data.poi,
+        address: data.address,
+        position: data.position,
+      });
+    }
+    //saveItinerayData[index]={}
+    console.log(saveItinerayData.value);
+  });
+}
+
+const setItineray = (addData) => {
+  console.log(isCheckOpen);
+  if (isCheckOpen.value) {
+    Itineraty(addData);
+  } else {
+    checkItineray(addData);
+    Itineraty(addData);
+  }
 };
 
 //=====================================================
@@ -217,16 +323,20 @@ const WaypointOptimization = (data) => {
       vehicleLoadType: ["USHazmatClass3", "otherHazmatExplosive"],
     },
   }).then((res) => {
+    //初始化
+    routeData1.value = [];
+    let saveData = [];
+    //
     res.data.optimizedOrder.forEach((placeName, placeIndex) => {
-      console.log(data[placeName]);
-      routeData1.value[placeIndex] = data[placeName].point;
-
-      marker(
+      routeData1.value[placeIndex] = data[placeName].point; //路徑畫線順序
+      setMarker(
         routeData1.value[placeIndex].longitude,
         routeData1.value[placeIndex].latitude,
         placeName
       );
+      saveData[placeIndex] = addData.value[placeName];
     });
+    addData.value = saveData;
     route(routeData1.value);
   });
 };
@@ -244,8 +354,6 @@ const route = (data) => {
     .then(function (res) {
       roadline = res.toGeoJson().features;
       roadline.forEach((features, index) => {
-        console.log(features);
-        console.log(index);
         window.map.addLayer({
           id: "route" + index,
           type: "line",
@@ -271,12 +379,6 @@ const removeRoute = (RouteArr) => {
     window.map.removeLayer(`route${i}`);
     window.map.removeSource(`route${i}`);
   }
-  /*RouteArr.forEach((value, index) => {
-    window.map.removeLayer(`route${index}`);
-    window.map.removeSource(`route${index}`);
-    console.log(i);
-  });
-  console.log("removeOK");*/
 };
 
 //=====================================================
@@ -319,7 +421,7 @@ const iconSytle = (mdiIcon, mdiColor = "black") => {
 //=====================================================
 //MARKER 設定
 const markerNumber = ref([]);
-const marker = (lngData, latData, index) => {
+const setMarker = (lngData, latData, index) => {
   //==========
   const markerHeight = 30,
     markerRadius = 10,
