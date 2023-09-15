@@ -1,5 +1,5 @@
 <template>
-  <LayoutAuthenticated class="h-screen">
+  <LayoutAuthenticated class="m-2 h-screen">
     <SectionTitleLineWithButton
       class="mx-6"
       :icon="mdiCar"

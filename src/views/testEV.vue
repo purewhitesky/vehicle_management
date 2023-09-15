@@ -8,12 +8,16 @@ import * as turf from "@turf/turf";
 import BaseButton from "@/components/BaseButton.vue";
 import { ref, reactive, onMounted, computed } from "vue";
 import { mdiEvStation } from "@mdi/js";
+import { apiGetGogoroList, apiPostGogoroVM } from "@/api/apiGogoro";
+import { useSetIcon } from "@/components/useTomTomIconElement";
+import CardBox from "@/components/CardBox.vue";
+import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
 const mapRef = ref(null);
 const center = { lat: 25.034228, lng: 121.563995 };
 const isEVOpen = ref(false);
 const ownGPSLocation = ref();
-
+const gogoroClick = ref(false);
 onMounted(() => {
   let map = tt.map({
     key: TOMTOMKEY,
@@ -38,6 +42,13 @@ onMounted(() => {
       //console.log("經度：" + ownGPSLocation.value.longitude);
     })
   );
+  map.on("click", (event) => {
+    //Listprojects()
+    gogoroClick.value = !gogoroClick.value;
+    console.log(event);
+    //觸發測試
+    //getReport(event.lngLat.lng, event.lngLat.lat);
+  });
 
   /*map.on("click", (event) => {
     const position = event.lngLat;
@@ -56,6 +67,26 @@ onMounted(() => {
   //console.log(map.getBounds());
 
   window.map = map;
+});
+
+const gogoraList = ref([]);
+apiGetGogoroList().then((res) => {
+  console.log(res.data);
+  console.log(res);
+  res.data.data.forEach((item, index) => {
+    useSetIcon(
+      {
+        lng: item.longitude,
+        lat: item.latitude,
+      },
+      index,
+      "40px",
+      `/Gogoro_icon3.png`,
+      window.map
+    );
+  });
+
+  console.log(gogoraList.value);
 });
 
 const EVData = ref({
@@ -230,8 +261,52 @@ function iconElement(marker, index, iconlistNum, isOpen) {
     ${chargData}`;
   textElement.appendChild(buttonElement);
 
+  const elementCreator = () => {
+    const generator = (innerHTML) => {
+      const parser = new DOMParser();
+      const testElement = parser.parseFromString(innerHTML, "text/html");
+      return testElement.body;
+    };
+
+    return {
+      element: (innerHTML) => {
+        return generator(innerHTML);
+      },
+      button: (innerHTML, onClickCallBack) => {
+        const btn = generator(innerHTML);
+        btn.addEventListener("click", onClickCallBack);
+        return btn;
+      },
+    };
+  };
+
+  const popupBoxCreator = () => {
+    const box = elementCreator().element(
+      /*html*/
+      `<div class="text-red-500 text-lg font-bold">
+        測試
+        
+      </div>`
+    );
+
+    const button = elementCreator().button(
+      /*html*/
+      `<button class="mt-2 w-full rounded-lg border-2">
+        Navigation
+      </button>`,
+      () => {
+        console.log("clickiiiiiiiii");
+      }
+    );
+
+    box.appendChild(button);
+
+    return box;
+  };
+
   const popup = new tt.Popup({ offset: popupOffsets }).setDOMContent(
-    textElement
+    // textElement
+    popupBoxCreator()
   );
   console.log(textElement);
   EVNumber.value[index] = new tt.Marker({ element: svgElement })
@@ -253,7 +328,7 @@ const removeMarker = () => {
 </script>
 <template>
   <LayoutAuthenticated>
-    <div class="m-6">
+    <div class="relative m-6">
       <BaseButton
         class="w-full border-2 border-gray-200 dark:border-gray-500"
         label="View nearby charging stations"
@@ -267,6 +342,21 @@ const removeMarker = () => {
         id="map"
         ref="mapRef"
       ></div>
+      <Transition>
+        <template v-if="gogoroClick">
+          <CardBox
+            class="absolute left-10 bottom-[5%] h-[82%] w-[23%] overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
+          >
+            <CardBoxComponentTitle
+              title="VINID"
+              main
+              class="border-b-2 border-slate-400"
+            ></CardBoxComponentTitle>
+
+            <div>|</div>
+          </CardBox>
+        </template>
+      </Transition>
     </div>
   </LayoutAuthenticated>
 </template>

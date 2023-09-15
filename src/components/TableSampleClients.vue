@@ -48,12 +48,16 @@ fix(testData.value).then((res) => {
 
 const DTCData = async () => {
   let carList;
+
+  let promiseList = [];
+
   await getUserAPI(PermissionsID).then((res) => {
     carList = res.data.car_list;
+    promiseList = carList.map((c) => getDTC(c.VIN_ID));
   });
-
-  for (const value of carList) {
-    await getDTC(value.VIN_ID).then((res) => {
+  //20230914
+  Promise.all(promiseList).then((results) => {
+    results.forEach((res) => {
       if (res.data.message != "NOT FOUND") {
         jsonData.value = {
           Date: res.data.Timestamp,
@@ -68,7 +72,8 @@ const DTCData = async () => {
           SecondaryDTC: res.data.VSS.DTC.SecondaryDTC,
           PrimaryCause: "",
           PredictedFix: "",
-          Emergency: res.data.VSS.DTC.Emergency,
+          Emergency: "",
+          positionLoading: true,
         };
         repairData1.value.push(jsonData.value);
         posArray1.push({
@@ -79,45 +84,110 @@ const DTCData = async () => {
         });
       }
     });
-  }
-  tts.services
-    .reverseGeocode({
-      language: "en-US",
-      batchMode: "sync",
-      key: TOMTOMKEY,
-      batchItems: posArray1,
-    })
-    .then((res) => {
-      res.batchItems.forEach((data, index) => {
-        repairData1.value[index].Position =
-          res.batchItems[index].addresses[0].address.freeformAddress;
+
+    tts.services
+      .reverseGeocode({
+        language: "en-US",
+        batchMode: "sync",
+        key: TOMTOMKEY,
+        batchItems: posArray1,
+      })
+      .then((res) => {
+        res.batchItems.forEach((data, index) => {
+          repairData1.value[index].Position =
+            res.batchItems[index].addresses[0].address.freeformAddress;
+          repairData1.value[index].positionLoading = false;
+        });
+      });
+    console.log(repairData1.value);
+    repairData1.value.forEach((fixValue, index) => {
+      fixData.value = {
+        "Primary DTC": fixValue.PrimaryDTC,
+        "Secondary DTC": fixValue.SecondaryDTC,
+        "Pending DTC": fixValue.PendingDTC,
+        username: "york",
+        password: "graphen4york",
+      };
+      fix(fixData.value).then((res) => {
+        console.log(res.data);
+        repairData1.value[index].PrimaryCause = res.data.Definitions;
+        repairData1.value[index].PredictedFix = res.data.Fix;
+        repairData1.value[index].Emergency = res.data.Aggregated_FixPriority;
       });
     });
-  console.log(repairData1.value);
-  repairData1.value.forEach((fixValue, index) => {
-    fixData.value = {
-      "Primary DTC": fixValue.PrimaryDTC,
-      "Secondary DTC": fixValue.SecondaryDTC,
-      "Pending DTC": fixValue.PendingDTC,
-      username: "york",
-      password: "graphen4york",
-    };
-    fix(fixData.value).then((res) => {
-      console.log(res.data);
-      repairData1.value[index].PrimaryCause = res.data.Definitions;
-      repairData1.value[index].PredictedFix = res.data.Fix;
-    });
   });
+
+  // for (const value of carList) {
+  //   await getDTC(value.VIN_ID).then((res) => {
+  //     if (res.data.message != "NOT FOUND") {
+  //       jsonData.value = {
+  //         Date: res.data.Timestamp,
+  //         VinID: res.data.VIN_ID,
+  //         Mileage: res.data.VSS.DTC.Mileage,
+  //         Position: {
+  //           lat: res.data.VSS.DTC.Latitude,
+  //           lng: res.data.VSS.DTC.Longitude,
+  //         },
+  //         PendingDTC: res.data.VSS.DTC.PendingDTC,
+  //         PrimaryDTC: res.data.VSS.DTC.PrimaryDTC,
+  //         SecondaryDTC: res.data.VSS.DTC.SecondaryDTC,
+  //         PrimaryCause: "",
+  //         PredictedFix: "",
+  //         Emergency: "",
+  //       };
+  //       repairData1.value.push(jsonData.value);
+  //       posArray1.push({
+  //         position: {
+  //           lat: res.data.VSS.DTC.Latitude,
+  //           lng: res.data.VSS.DTC.Longitude,
+  //         },
+  //       });
+  //     }
+  //   });
+  // }
+  // tts.services
+  //   .reverseGeocode({
+  //     language: "en-US",
+  //     batchMode: "sync",
+  //     key: TOMTOMKEY,
+  //     batchItems: posArray1,
+  //   })
+  //   .then((res) => {
+  //     res.batchItems.forEach((data, index) => {
+  //       repairData1.value[index].Position =
+  //         res.batchItems[index].addresses[0].address.freeformAddress;
+  //     });
+  //   });
+  // console.log(repairData1.value);
+  // repairData1.value.forEach((fixValue, index) => {
+  //   fixData.value = {
+  //     "Primary DTC": fixValue.PrimaryDTC,
+  //     "Secondary DTC": fixValue.SecondaryDTC,
+  //     "Pending DTC": fixValue.PendingDTC,
+  //     username: "york",
+  //     password: "graphen4york",
+  //   };
+  //   fix(fixData.value).then((res) => {
+  //     console.log(res.data);
+  //     repairData1.value[index].PrimaryCause = res.data.Definitions;
+  //     repairData1.value[index].PredictedFix = res.data.Fix;
+  //     repairData1.value[index].Emergency = res.data.Aggregated_FixPriority;
+  //   });
+  // });
 };
 
 const change = (data) => {
   switch (data) {
-    case "Red":
-      return "red";
-    case "Yellow":
-      return "yellow";
+    case "3":
+      return "bg-red-400";
+    case "2":
+      return "bg-orange-400";
+    case "1":
+      return "bg-yellow-400";
+    case "0":
+      return "bg-green-400";
     default:
-      return "gray";
+      return "bg-gray-400";
   }
 };
 
@@ -180,7 +250,7 @@ const pagesList = computed(() => {
         </td>
         <td data-label="Mileage">{{ itemsData.Mileage }} km</td>
         <td data-label="Position">
-          {{ itemsData.Position }}
+          {{ itemsData.positionLoading ? "解析中..." : itemsData.Position }}
         </td>
 
         <td data-label="Primary Cause">
@@ -219,17 +289,3 @@ const pagesList = computed(() => {
     </BaseLevel>
   </div>
 </template>
-<style>
-.red {
-  --tw-bg-opacity: 1;
-  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
-}
-.yellow {
-  --tw-bg-opacity: 1;
-  background-color: rgb(250 204 21 / var(--tw-bg-opacity));
-}
-.gray {
-  --tw-bg-opacity: 1;
-  background-color: rgb(156 163 175 / var(--tw-border-opacity));
-}
-</style>

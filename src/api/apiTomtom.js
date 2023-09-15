@@ -10,6 +10,18 @@ const NotificationsNumber = 1;
 
 //===============
 
+// 20230914
+// const api = () => {
+
+//   const apiURL = "https://api.tomtom.com"
+
+//   return {
+//     matrixRoutingRequest: axios.create({
+//       baseURL: `${apiURL}/matrix/`,
+//     }),
+//   };
+// };
+
 const matrixRoutingRequest = axios.create({
   baseURL: "https://api.tomtom.com/routing/matrix/",
 });
@@ -104,12 +116,12 @@ export const apiEditprojects = (projectId, ADMINKEY, data) =>
     `${geofencingVersionNumber}/projects/${projectId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     data
   );
-export const apiDeleteprojects = (projectId, ADMINKEY, isTrue) => {
-  geofencingRequest.post(
-    `${geofencingVersionNumber}/projects/${projectId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}&dryRun=${isTrue}`,
+export const apiDeleteprojects = (projectId, ADMINKEY, isFalseDeleteData) => {
+  return geofencingRequest.delete(
+    `${geofencingVersionNumber}/projects/${projectId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     {
       params: {
-        dryRun: isTrue,
+        dryRun: isFalseDeleteData,
       },
     }
   );
@@ -147,22 +159,23 @@ export const apiEditfence = (fenceId, ADMINKEY, data) =>
     `${geofencingVersionNumber}/fences/${fenceId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     data
   );
-export const apiAddnewfencetoaproject = (projectId, ADMINKEY, data) =>
-  geofencingRequest.post(
+export const apiAddnewfencetoaproject = (projectId, ADMINKEY, data) => {
+  return geofencingRequest.post(
     `${geofencingVersionNumber}/projects/${projectId}/fence?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     data
   );
+};
 export const apiCreatenewfence = (ADMINKEY, data) =>
   geofencingRequest.post(
     `${geofencingVersionNumber}/fences/fence?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     data
   );
-export const apiDeletefence = (fenceId, ADMINKEY, isTrue) => {
-  geofencingRequest.delete(
-    `${geofencingVersionNumber}/fences/${fenceId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}&dryRun=${isTrue}`,
+export const apiDeletefence = (fenceId, ADMINKEY, isFalseDeleteData) => {
+  return geofencingRequest.delete(
+    `${geofencingVersionNumber}/fences/${fenceId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     {
       params: {
-        dryRun: isTrue,
+        dryRun: isFalseDeleteData,
       },
     }
   );
@@ -174,7 +187,7 @@ export const apiDeletefencefromproject = (
   ADMINKEY,
   isTrue
 ) => {
-  geofencingRequest.delete(
+  return geofencingRequest.delete(
     `${geofencingVersionNumber}/projects/${projectId}/fences/${fenceId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     {
       params: {
@@ -196,16 +209,18 @@ export const apiAddnewobject = (ADMINKEY, data) =>
     `${geofencingVersionNumber}/objects/object?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     data
   );
+
 export const apiEditobject = (objectId, ADMINKEY, data) =>
   geofencingRequest.put(
     `${geofencingVersionNumber}/objects/${objectId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     data
   );
 
-export const apiDeleteobject = (objectId, ADMINKEY) =>
-  geofencingRequest.delete(
+export const apiDeleteobject = (objectId, ADMINKEY) => {
+  return geofencingRequest.delete(
     `${geofencingVersionNumber}/objects/${objectId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`
   );
+};
 
 //報告服務Report service
 export const apigetReport = (
@@ -418,11 +433,12 @@ export const apiUpdatealertrulepartially = (ruleId, ADMINKEY, data) =>
     `${geofencingVersionNumber}/alerts/rules/${ruleId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     data
   );
-export const apiDeletealertrule = (ruleId, ADMINKEY, data) =>
-  geofencingRequest.post(
+export const apiDeletealertrule = (ruleId, ADMINKEY, data) => {
+  return geofencingRequest.post(
     `${geofencingVersionNumber}/alerts/rules/${ruleId}?key=${TOMTOMKEY}&adminKey=${ADMINKEY}`,
     data
   );
+};
 export const apiListalerthistory = (
   startTime,
   endTime,
@@ -538,8 +554,8 @@ export const apiHistoryDownloadPreparedData = (token, ADMINKEY) =>
 //======================================================================
 //Notifications API
 //配置服務 Configuration service
-export const apiNotificationsListCurrentOptions = () =>
-  Notifications.get(`${NotificationsNumber}/settings?key=${TOMTOMKEY}`);
+export const apiNotificationsListCurrentOptions = () => {};
+Notifications.get(`${NotificationsNumber}/settings?key=${TOMTOMKEY}`);
 
 export const apiNotifications = {
   //配置服務 Configuration service

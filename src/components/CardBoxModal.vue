@@ -20,6 +20,10 @@ const props = defineProps({
     type: String,
     default: "Done",
   },
+  buttonTo: {
+    type: String,
+    default: "",
+  },
   hasCancel: Boolean,
   modelValue: {
     type: [String, Number, Boolean],
@@ -48,13 +52,15 @@ window.addEventListener("keydown", (e) => {
     cancel();
   }
 });
+
+console.log(props.modelValue);
 </script>
 
 <template>
   <OverlayLayer v-show="value" @overlay-click="cancel">
     <CardBox
       v-show="value"
-      class="shadow-lg max-h-modal w-11/12 md:w-3/5 lg:w-2/5 xl:w-4/12 z-50"
+      class="z-50 max-h-modal w-11/12 shadow-lg md:w-3/5 lg:w-2/5 xl:w-4/12"
       is-modal
     >
       <CardBoxComponentTitle :title="title">
@@ -74,7 +80,12 @@ window.addEventListener("keydown", (e) => {
 
       <template #footer>
         <BaseButtons>
-          <BaseButton :label="buttonLabel" :color="button" @click="confirm" />
+          <BaseButton
+            :label="buttonLabel"
+            :color="button"
+            @click="confirm"
+            :to="buttonTo"
+          />
           <BaseButton
             v-if="hasCancel"
             label="Cancel"

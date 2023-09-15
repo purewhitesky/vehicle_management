@@ -110,7 +110,7 @@ const routes = [
     meta: {
       title: "test",
     },
-    path: "/test", //報錯顯示404頁面
+    path: "/test",
     name: "test",
     component: () => import("@/views/testView.vue"),
   },
@@ -118,7 +118,7 @@ const routes = [
     meta: {
       title: "test2",
     },
-    path: "/test2", //報錯顯示404頁面
+    path: "/test2",
     name: "test2",
     component: () => import("@/views/test2.vue"),
   },
@@ -126,7 +126,7 @@ const routes = [
     meta: {
       title: "test3",
     },
-    path: "/test3", //報錯顯示404頁面
+    path: "/test3",
     name: "test3",
     component: () => import("@/views/test3.vue"),
   },
@@ -134,7 +134,7 @@ const routes = [
     meta: {
       title: "testEV",
     },
-    path: "/testEV", //報錯顯示404頁面
+    path: "/testEV",
     name: "testEV",
     component: () => import("@/views/testEV.vue"),
   },
@@ -142,15 +142,23 @@ const routes = [
     meta: {
       title: "testMapFleet",
     },
-    path: "/testMapFleet", //報錯顯示404頁面
+    path: "/testMapFleet",
     name: "testMapFleet",
     component: () => import("@/views/testMapFleet.vue"),
   },
   {
     meta: {
+      title: "testAlert",
+    },
+    path: "/testAlert",
+    name: "testAlert",
+    component: () => import("@/views/testAlert.vue"),
+  },
+  {
+    meta: {
       title: "testLocationHistory",
     },
-    path: "/testLocationHistory", //報錯顯示404頁面
+    path: "/testLocationHistory",
     name: "testLocationHistory",
     component: () => import("@/views/testLocationHistory.vue"),
   },
@@ -158,23 +166,55 @@ const routes = [
     meta: {
       title: "testMap",
     },
-    path: "/testMap", //報錯顯示404頁面
+    path: "/testMap",
     name: "testMap",
     component: () => import("@/views/testMap.vue"),
   },
   {
     meta: {
+      title: "testRegistrationRoute",
+    },
+    path: "/testRegistrationRoute",
+    name: "testRegistrationRoute",
+    component: () => import("@/views/testRegistrationRoute.vue"),
+  },
+  {
+    meta: {
       title: "RouteItinerary",
     },
-    path: "/RouteItinerary", //報錯顯示404頁面
-    name: "RouteItinerary",
+    path: "/RouteItinerary/:id",
+    name: "RouteItinerary/:id",
     component: () => import("@/views/RouteItinerary.vue"),
+  },
+  {
+    meta: {
+      title: "ListItinerary",
+    },
+    path: "/ListItinerary",
+    name: "ListItinerary",
+    component: () => import("@/views/ListItinerary.vue"),
+  },
+  {
+    meta: {
+      title: "ListItineraryMap",
+    },
+    path: "/ListItineraryMap",
+    name: "ListItineraryMap",
+    component: () => import("@/views/ListItineraryMap.vue"),
+  },
+  {
+    meta: {
+      title: "SeeTomTom",
+    },
+    path: "/SeeTomTom",
+    name: "SeeTomTom",
+    component: () => import("@/views/SeeTomTom.vue"),
   },
   {
     meta: {
       title: "Register",
     },
-    path: "/Register", //報錯顯示404頁面
+    path: "/Register",
     name: "Register",
     component: () => import("@/views/Register.vue"),
   },

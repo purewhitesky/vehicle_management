@@ -589,6 +589,7 @@ const Getfencedetails = (fencesData, counter = 0) => {
         units: "kilometers", // or "mile"
       };
       let _circle = turf.circle(_center, _radius, _options);
+
       console.log(_circle);
       window.map.addSource(`${fencesData}`, {
         type: "geojson",

@@ -199,6 +199,7 @@ const addMarkerArr = (marker) => {
 };
 
 const addMarker1 = (marker) => {
+  fuzzySearch;
   //a = new tt.Marker().setLngLat(center).addTo(window.map);
   iconElement(marker, 0, 0);
   console.log("add");

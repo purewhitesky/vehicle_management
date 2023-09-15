@@ -24,7 +24,7 @@ const styleStore = useStyleStore();
 <template>
   <div
     :class="[type, zIndex]"
-    class="items-center flex-col justify-center overflow-hidden fixed inset-0"
+    class="fixed inset-0 flex-col items-center justify-center overflow-hidden"
   >
     <transition
       enter-active-class="transition duration-150 ease-in"

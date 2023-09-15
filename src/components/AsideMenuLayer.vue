@@ -51,7 +51,7 @@ const asideLgCloseClick = (event) => {
         >
           <!--MIH LOGO SETTING-->
           <img
-            src="https://www.mih-ev.org/wp-content/themes/echo-wordpress-custom/mih/images/logo/MIH-consortium-logo_20210728.svg"
+            src="https://www.mih-ev.org/img/MIH-consortium-logo_20210728.svg"
             width="120"
             class="self-center"
           />

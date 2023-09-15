@@ -1,109 +1,9 @@
-<template>
-  <LayoutAuthenticated>
-    <div class="relative m-6">
-      <div
-        class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
-        id="map"
-        ref="mapRef"
-      ></div>
-      <CardBox
-        hasComponentLayout
-        class="absolute left-10 top-[5%] h-[8%] w-[20%]"
-      >
-        <input
-          type="text"
-          id="first_name"
-          class="m-2 flex-1 rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-[#333333] dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-          v-model="searchText"
-          placeholder="Please Enter A Location"
-        />
-      </CardBox>
-      <template v-if="isSearchOpen">
-        <CardBox
-          hasComponentLayout
-          class="absolute left-10 top-[14%] h-auto max-h-[80%] w-[20%] overflow-y-scroll aside-scrollbars-light"
-        >
-          <div class="m-2">
-            <div v-for="(item, index) in searchSeeData">
-              <div
-                class="m-2 flex min-h-[100px] items-center gap-2 border-t-2 border-[#333333] px-2 py-4"
-              >
-                <div class="">
-                  <BaseButton
-                    color="#333333"
-                    :icon="mdiPlusBox"
-                    iconSize="30"
-                    @click="addItineray(index)"
-                    class="hover:border-green-500 hover:text-green-500"
-                  ></BaseButton>
-                </div>
-                <div class="flex flex-col">
-                  <div class="flex text-2xl">
-                    {{ item.poi }}
-                  </div>
-                  <div class="flex text-gray-400">
-                    {{ item.address }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardBox>
-      </template>
-      <template v-if="isItineratyOpen">
-        <CardBox
-          class="absolute right-10 top-[5%] h-[90%] w-[20%] overflow-y-scroll aside-scrollbars-light"
-        >
-          <div class="m-2">
-            <CardBoxComponentTitle
-              title="Itineraty"
-              main
-              class="border-b-2 border-slate-400"
-            >
-              <BaseButton
-                color="#333333"
-                :icon="mdiEye"
-                iconSize="30"
-                @click="checkItineray(addData)"
-                class="hover:border-green-500 hover:text-green-500"
-              ></BaseButton>
-              <BaseButton
-                color="#333333"
-                :icon="mdiCheck"
-                iconSize="30"
-                @click="setItineray(addData)"
-                class="hover:border-green-500 hover:text-green-500"
-              ></BaseButton>
-            </CardBoxComponentTitle>
-
-            <div v-for="(item, index) in addData">
-              <div
-                class="m-2 flex h-[100px] items-center gap-2 border-b-2 border-[#333333] px-2"
-              >
-                <BaseButton
-                  color="#333333"
-                  :icon="mdiMinus"
-                  iconSize="30"
-                  @click="deleteItineray(index)"
-                  class="hover:border-red-500 hover:text-red-500"
-                ></BaseButton>
-                <div>{{ index + 1 }}</div>
-                :
-                <div>{{ item.name }}</div>
-              </div>
-            </div>
-          </div>
-        </CardBox>
-      </template>
-    </div>
-  </LayoutAuthenticated>
-</template>
 <script setup>
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import CardBox from "@/components/CardBox.vue";
 import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
-
+import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
@@ -111,13 +11,29 @@ import "@tomtom-international/web-sdk-plugin-searchbox/dist/SearchBox.css";
 
 import TomTomStyle from "@/style/tomtomstyle.json";
 import { ref, reactive, onMounted, computed, watch } from "vue";
-import { mdiPlusBox, mdiMapMarker, mdiEye, mdiCheck, mdiMinus } from "@mdi/js";
+import {
+  mdiPlusBox,
+  mdiMapMarker,
+  mdiEye,
+  mdiCheck,
+  mdiMinus,
+  mdiArrowUpBoldBox,
+  mdiClose,
+} from "@mdi/js";
 import { apiWaypointOptimization } from "@/api/apiTomtom";
+import { useRoute } from "vue-router";
+import { VueDraggable } from "vue-draggable-plus";
+import { postItinerary } from "@/api/obd_alwayshow";
+import { usePermissionsList } from "@/components/PermissionsList";
+import * as turf from "@turf/turf";
 
 const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
 
 const mapRef = ref(null);
 const center = { lat: 25.034228, lng: 121.563995 };
+
+const id = useRoute().params.id;
+console.log(id);
 
 onMounted(() => {
   let map = tt.map({
@@ -132,6 +48,24 @@ onMounted(() => {
   window.map = map;
 });
 
+//=======
+const { PermissionsCarlist } = usePermissionsList();
+const carNumberList = ref([]);
+const pushCarNumber = (carNumber) => {
+  if (carNumberList.value.indexOf(carNumber) == -1) {
+    carNumberList.value.push(carNumber);
+  } else {
+    console.log(`${carNumber} is already use`);
+  }
+  saveItinerayData.value.VINID = carNumberList.value;
+};
+const cancelCarNumber = (itemSearch) => {
+  const index = carNumberList.value.indexOf(itemSearch);
+  carNumberList.value.splice(index, 1);
+  console.log(index);
+};
+//=======
+
 const searchText = ref();
 const searchData = ref([]);
 const searchSeeData = ref([]);
@@ -145,7 +79,9 @@ const searchSeeData = ref([]);
 const isSearchOpen = ref(false);
 const isItineratyOpen = ref(false);
 const isRemoveOpen = ref(false);
+const isDraggableOpen = ref(false);
 
+//預定製作延遲判定
 const addressData = (data) => {
   tts.services
     .fuzzySearch({
@@ -202,25 +138,35 @@ watch(searchText, () => {
 });
 
 const addData = ref([]);
+
 const addItineray = (index) => {
   isItineratyOpen.value = true;
   addData.value.push(searchSeeData.value[index]);
+  if (isCheckOpen.value) {
+    updataItineray(addData.value);
+  }
 };
 
 const deleteItineray = (index) => {
   addData.value.splice(index, 1);
   console.log(addData.value);
+  if (isCheckOpen.value) {
+    updataItineray(addData.value);
+  }
 };
 
 const isCheckOpen = ref(false);
+const isSetFenceOpen = ref(false);
+const isSetCarOpen = ref(false);
 const routeData = ref([]);
-const checkItineray = (setAddData) => {
+
+const dataItineray = (setAddData) => {
   //初始化
   isCheckOpen.value = true;
   routeData.value = [];
   //
   removeMarker(markerNumber.value);
-  isRemoveOpen.value ? !isRemoveOpen.value : removeRoute(routeName.value);
+  isRemoveOpen.value ? !isRemoveOpen.value : removeRoutes(saveRouteName.value);
   isSearchOpen.value = false;
   let lat = 0;
   let lng = 0;
@@ -243,24 +189,95 @@ const checkItineray = (setAddData) => {
     lat: lat,
     lng: lng,
   });
+};
+
+const checkItineray = (setAddData) => {
+  dataItineray(setAddData);
   WaypointOptimization(routeData.value);
 };
 
+const updataItineray = (setAddData) => {
+  dataItineray(setAddData);
+  routeData1.value = [];
+  routeData.value.forEach((placeName, placeIndex) => {
+    routeData1.value[placeIndex] = routeData.value[placeIndex].point;
+    setMarker(
+      routeData.value[placeIndex].point.longitude,
+      routeData.value[placeIndex].point.latitude,
+      placeIndex
+    );
+  });
+  route(routeData1.value);
+};
+
+const setRange = ref(500);
+/*const updataFenceRange = (setAddData, rangeData) => {
+  setRange.value = rangeData;
+  dataItineray(setAddData);
+  routeData1.value = [];
+  routeData.value.forEach((placeName, placeIndex) => {
+    routeData1.value[placeIndex] = routeData.value[placeIndex].point;
+    setMarker(
+      routeData.value[placeIndex].point.longitude,
+      routeData.value[placeIndex].point.latitude,
+      placeIndex
+    );
+  });
+  route(routeData1.value, setRange.value);
+  saveItinerayData.value.fenceRadius = setRange.value;
+};*/
+const updataFenceRange = (setAddData, event) => {
+  console.log(event);
+  setRange.value = event.target.value;
+  dataItineray(setAddData);
+  routeData1.value = [];
+  routeData.value.forEach((placeName, placeIndex) => {
+    routeData1.value[placeIndex] = routeData.value[placeIndex].point;
+    setMarker(
+      routeData.value[placeIndex].point.longitude,
+      routeData.value[placeIndex].point.latitude,
+      placeIndex
+    );
+  });
+  route(routeData1.value, setRange.value);
+  saveItinerayData.value.fenceRadius = setRange.value;
+};
+
+const postData = (data) => {
+  postItinerary(data).then((res) => {
+    console.log(res);
+    window.location.href = "/ListItineraryMap";
+  });
+};
+
 const saveItinerayData = ref({
-  VINID: "",
+  VINID: [],
   verifyID: "",
-  carID: "",
   date: "",
-  itineratyName: "",
-  itineraty: [],
+  itineraryName: id,
+  itinerary: [],
+  itineraryData: [],
+  fenceRadius: 500,
 });
+
+const itineraryDataCreator = (data) => {
+  const { address, poi, position } = data;
+
+  return {
+    address: address,
+    name: poi ?? address,
+    poi: poi,
+    position: position,
+  };
+};
+
 /*
 {
   VINID:""
   verifyID:"",
   carID:"",
   date:"",
-  itineraty:[{
+  itinerary:[{
       name:"",
       poi:"",
       address:"",
@@ -270,38 +287,50 @@ const saveItinerayData = ref({
       },
     },
   }]
+  itineraryData:[]
 }
 */
-function Itineraty(addData) {
+//20230914 ?. ??差別
+const addItinerary = (addData) => {
   console.log(addData);
-  addData.forEach((data, index) => {
-    if (data.poi != "") {
-      saveItinerayData.value.itineraty.push({
-        name: data.poi,
-        poi: data.poi,
-        address: data.address,
-        position: data.position,
-      });
-    } else {
-      saveItinerayData.value.itineraty.push({
-        name: data.address,
-        poi: data.poi,
-        address: data.address,
-        position: data.position,
-      });
-    }
-    //saveItinerayData[index]={}
-    console.log(saveItinerayData.value);
-  });
-}
+  addData.forEach((data) => itineraryDataCreator(data));
+  // {
+  //   if (data.poi != "") {
+  //     saveItinerayData.value.itinerary.push({
+  //       address: data.address,
+  //       name: data.poi,
+  //       poi: data.poi,
+  //       position: data.position,
+  //     });
+  //   } else {
+  //     saveItinerayData.value.itinerary.push({
+  //       address: data.address,
+  //       name: data.address,
+  //       poi: data.poi,
+  //       position: data.position,
+  //     });
+  //   }
+  // }
+  //saveItinerayData.value.itineraryName = id;
+  saveItinerayData.value.date = aData.toUTCString();
+};
 
+//const see = ref([]);
 const setItineray = (addData) => {
-  console.log(isCheckOpen);
+  isSetFenceOpen.value = true;
   if (isCheckOpen.value) {
-    Itineraty(addData);
+    addItinerary(addData);
+    //postData(saveItinerayData.value);
+    console.log(aData.toUTCString());
+    console.log(saveItinerayData.value);
+    // see.value = saveItinerayData.value;
   } else {
     checkItineray(addData);
-    Itineraty(addData);
+    addItinerary(addData);
+    //postData(saveItinerayData.value);
+    console.log(aData.toUTCString());
+    console.log(saveItinerayData.value);
+    //see.value = saveItinerayData.value;
   }
 };
 
@@ -338,24 +367,103 @@ const WaypointOptimization = (data) => {
     });
     addData.value = saveData;
     route(routeData1.value);
+    console.log(routeData1.value);
   });
 };
 
 //=====================================================
 //路徑生成
+
+//存檔名稱
+const saveRouteName = ref([]);
+//設定取樣
+const setSamplingPoint = ref(20);
+//=============================================================================
+const seeItinerary = ref([]);
+const seeItineraryData = ref([]);
+const seeItineraryLengthLabel = ref();
+
 const routeName = ref();
-const route = (data) => {
+const change = ref();
+const route = (data, rangeData = 500) => {
   let roadline = "";
   tts.services
     .calculateRoute({
       key: TOMTOMKEY,
       locations: data,
+      trackingId: "975a4e8e-e6c9-492b-84d1-916cf352109a",
     })
     .then(function (res) {
-      roadline = res.toGeoJson().features;
-      roadline.forEach((features, index) => {
+      saveItinerayData.value.itineraryData = res.toGeoJson().features;
+      saveItinerayData.value.itineraryData.forEach((features, index) => {
+        console.log(features);
+
+        seeItinerary.value = [];
+        seeItineraryLengthLabel.value = "";
+        seeItineraryData.value = features.geometry.coordinates;
+        seeItineraryLengthLabel.value = seeItineraryData.value.length;
+
+        if (seeItineraryLengthLabel.value > 20) {
+          console.log(seeItineraryLengthLabel.value);
+          console.log();
+          if (seeItineraryData.value.length > 100) {
+            for (
+              let j = 0;
+              j < seeItineraryData.value.length / setSamplingPoint.value;
+              j++
+            ) {
+              seeItinerary.value.push(
+                seeItineraryData.value[j * setSamplingPoint.value]
+              );
+            }
+          } else {
+            for (let j = 0; j < seeItineraryData.value.length; j++) {
+              seeItinerary.value.push(seeItineraryData.value[j]);
+            }
+          }
+        } else {
+          for (let i = 0; i < seeItineraryLengthLabel.value; i++) {
+            //console.log(seeItineraryData.value[i]);
+            if (seeItineraryData.value[i].length > 100) {
+              for (
+                let j = 0;
+                j < seeItineraryData.value[i].length / setSamplingPoint.value;
+                j++
+              ) {
+                seeItinerary.value.push(
+                  seeItineraryData.value[i][j * setSamplingPoint.value]
+                );
+              }
+            } else {
+              for (let j = 0; j < seeItineraryData.value[i].length; j++) {
+                seeItinerary.value.push(seeItineraryData.value[i][j]);
+              }
+            }
+          }
+        }
+        console.log(seeItinerary.value);
+
+        //存儲刪除變數檔
+        saveRouteName.value.push([index + "_line", index + "_fill"]);
+        //設定檔
+        const turfOptions = {
+          units: "meters",
+        };
+        //資料檔
+
+        const geometry = {
+          type: "LineString",
+          shapeType: "Corridor",
+          radius: rangeData,
+          coordinates: seeItinerary.value,
+        };
+        //轉換點成範圍點
+        const geoJsonData = ref(
+          turf.buffer(geometry, geometry.radius, turfOptions)
+        );
+
         window.map.addLayer({
-          id: "route" + index,
+          id: `${index}_line`,
           type: "line",
           source: {
             type: "geojson",
@@ -363,22 +471,40 @@ const route = (data) => {
           },
           paint: {
             "line-color": "#0088f0",
-            "line-width": 4,
-            "line-opacity": 0.5,
+            "line-width": 1,
+            "line-opacity": 1,
+          },
+        });
+
+        window.map.addLayer({
+          id: index + "_fill",
+          type: "fill",
+          source: {
+            type: "geojson",
+            data: geoJsonData.value, //geojson的資料
+          },
+          layout: {},
+          paint: {
+            "fill-color": `#0088f0`,
+            "fill-opacity": 0.2,
           },
         });
       });
-      console.log(roadline.length);
-      routeName.value = roadline.length;
+      //console.log(roadline.length);
+      routeName.value = saveItinerayData.value.itineraryData.length;
     });
 };
 
-const removeRoute = (RouteArr) => {
+const removeRoutes = (RouteArr) => {
   console.log(RouteArr);
-  for (let i = 0; i < RouteArr; i++) {
-    window.map.removeLayer(`route${i}`);
-    window.map.removeSource(`route${i}`);
+  for (let i = 0; i < RouteArr.length; i++) {
+    console.log(RouteArr[i]);
+    window.map.removeLayer(RouteArr[i][0]);
+    window.map.removeSource(RouteArr[i][0]);
+    window.map.removeLayer(RouteArr[i][1]);
+    window.map.removeSource(RouteArr[i][1]);
   }
+  saveRouteName.value = [];
 };
 
 //=====================================================
@@ -418,6 +544,7 @@ const iconSytle = (mdiIcon, mdiColor = "black") => {
   document.body.appendChild(svgElement);
   return svgElement;
 };
+
 //=====================================================
 //MARKER 設定
 const markerNumber = ref([]);
@@ -456,6 +583,211 @@ const removeMarker = (markerArr) => {
   });
   console.log(markerArr);
 };
+//=====================================================
+//現在時間製作
+let aData = new Date();
 
 //=====================================================
+const a = () => {
+  console.log("use");
+};
 </script>
+<template>
+  <LayoutAuthenticated>
+    <!--{{ see }}-->
+    <SectionTitleLineWithButton class="mx-6" :title="'Itinerary ' + id" main>
+    </SectionTitleLineWithButton>
+    <div class="relative m-6">
+      <div
+        class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
+        id="map"
+        ref="mapRef"
+      ></div>
+      <template v-if="!isSetFenceOpen">
+        <CardBox
+          hasComponentLayout
+          class="absolute left-10 top-[5%] h-[8%] w-[20%]"
+        >
+          <input
+            type="text"
+            id="first_name"
+            class="m-1 flex-1 rounded-xl border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-[#333333] dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+            v-model="searchText"
+            placeholder="Please Enter A Location"
+          />
+        </CardBox>
+        <template v-if="isSearchOpen">
+          <CardBox
+            hasComponentLayout
+            class="absolute left-10 top-[14%] h-auto max-h-[80%] w-[20%] overflow-y-scroll aside-scrollbars-light"
+          >
+            <div class="m-2">
+              <div v-for="(item, index) in searchSeeData" :key="item.name">
+                <div
+                  class="m-2 flex min-h-[100px] items-center gap-2 border-t-2 border-[#333333] px-2 py-4"
+                >
+                  <div class="">
+                    <BaseButton
+                      color="#333333"
+                      :icon="mdiPlusBox"
+                      iconSize="30"
+                      @click="addItineray(index)"
+                      class="hover:border-green-500 hover:text-green-500"
+                    ></BaseButton>
+                  </div>
+                  <div class="flex flex-col">
+                    <div class="flex text-2xl">
+                      {{ item.poi }}
+                    </div>
+                    <div class="flex text-gray-400">
+                      {{ item.address }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardBox>
+        </template>
+      </template>
+
+      <template v-if="isItineratyOpen">
+        <CardBox
+          class="absolute right-10 top-[5%] h-[90%] w-[20%] overflow-y-scroll aside-scrollbars-light"
+        >
+          <template v-if="!isSetFenceOpen">
+            <div class="m-2">
+              <CardBoxComponentTitle
+                title="Itinerary"
+                main
+                class="border-b-2 border-slate-400"
+              >
+                <template v-if="!isCheckOpen">
+                  <BaseButton
+                    color="#333333"
+                    :icon="mdiEye"
+                    iconSize="30"
+                    @click="checkItineray(addData)"
+                    class="hover:border-green-500 hover:text-green-500"
+                  ></BaseButton>
+                </template>
+                <template v-if="isCheckOpen">
+                  <BaseButton
+                    color="#333333"
+                    :icon="mdiArrowUpBoldBox"
+                    iconSize="30"
+                    @click="checkItineray(addData)"
+                    class="hover:border-green-500 hover:text-green-500"
+                  ></BaseButton>
+                  <BaseButton
+                    color="#333333"
+                    :icon="mdiCheck"
+                    iconSize="30"
+                    @click="setItineray(addData)"
+                    class="hover:border-green-500 hover:text-green-500"
+                  ></BaseButton>
+                  <!--to="/ListItineraryMap"-->
+                </template>
+              </CardBoxComponentTitle>
+              <VueDraggable
+                v-model="addData"
+                :animation="200"
+                @end="updataItineray(addData)"
+              >
+                <div v-for="(item, index) in addData" :key="item.name">
+                  <div
+                    class="m-2 flex h-[100px] items-center gap-2 border-b-2 border-[#333333] px-2"
+                  >
+                    <BaseButton
+                      color="#333333"
+                      :icon="mdiMinus"
+                      iconSize="30"
+                      @click="deleteItineray(index)"
+                      class="hover:border-red-500 hover:text-red-500"
+                    ></BaseButton>
+                    <div>{{ index }}</div>
+                    :
+                    <div>{{ item.name }}</div>
+                  </div>
+                </div>
+              </VueDraggable>
+            </div>
+          </template>
+          <template v-if="isSetFenceOpen">
+            <div class="m-2 grid gap-4">
+              <CardBoxComponentTitle
+                title="Setting fence"
+                main
+                class="border-b-2 border-slate-400"
+                ><BaseButton
+                  color="#333333"
+                  :icon="mdiCheck"
+                  iconSize="30"
+                  @click="postData(saveItinerayData)"
+                  class="hover:border-green-500 hover:text-green-500"
+                ></BaseButton
+              ></CardBoxComponentTitle>
+              <div class="text-center text-5xl">{{ setRange }}m</div>
+              <input
+                id="steps-range"
+                type="range"
+                min="100"
+                max="5000"
+                value="500"
+                step="100"
+                @mouseup="updataFenceRange(addData, $event)"
+                class="h-6 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
+              />
+            </div>
+          </template>
+          <template v-if="isSetFenceOpen">
+            <div class="m-2">
+              <CardBoxComponentTitle
+                title="Setting Car"
+                main
+                class="border-b-2 border-slate-400"
+              ></CardBoxComponentTitle>
+              <div class="group relative">
+                <div v-for="itemSearch in carNumberList" class="flex">
+                  <div
+                    class="m-1 flex min-w-[180px] flex-row rounded-full bg-gray-500 p-2"
+                  >
+                    <div class="flex-1 place-self-center text-xs">
+                      {{ itemSearch }}
+                    </div>
+                    <div>
+                      <BaseButton
+                        :icon="mdiClose"
+                        color="whiteDark"
+                        rounded-full
+                        @click="cancelCarNumber(itemSearch)"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <div>--------車輛清單--------</div>
+                  <BaseIcon :path="mdiArrowUp" class="group-hover:rotate-180" />
+                </div>
+                <div
+                  class="absolute hidden w-full divide-y rounded-lg border bg-[#333333] group-hover:block"
+                >
+                  <div
+                    v-for="(carNumber, index) in PermissionsCarlist"
+                    class="text-center"
+                  >
+                    <button
+                      class="hover:text-red-500"
+                      @click="pushCarNumber(carNumber.VIN_ID)"
+                    >
+                      {{ carNumber.VIN_ID }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </CardBox>
+      </template>
+    </div>
+  </LayoutAuthenticated>
+</template>

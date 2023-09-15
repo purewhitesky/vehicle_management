@@ -37,7 +37,7 @@ export function getUserAPI(param) {
 
 import axios from "axios";
 const MIHapi = axios.create({
-  baseURL: "https://mih-fleet.westus2.cloudapp.azure.com/",
+  baseURL: "https://mih-fleet3.westus2.cloudapp.azure.com/",
 });
 
 export const getPageAPI = (param) =>
@@ -55,7 +55,27 @@ export const getHistoryAPI = (param) =>
 export const getUserAPI = (param) =>
   MIHapi.get(`/api/get/car`, { params: param });
 
+export const getCamera = () => {
+  MIHapi.get(`/video_feed`);
+};
+
 export const getTomTomAlert = () => MIHapi.get(`/api/geofence`);
 
 export const getDTC = (ID) =>
   MIHapi.get(`api/get/dtc`, { params: { VINID: ID } });
+
+export const getCarAlert = (param) =>
+  MIHapi.get(`/api/get/alert`, { params: { VINID: param } });
+
+export const getItinerary = (ID) =>
+  MIHapi.get(`api/itinerary`, { params: { itineraryName: ID } });
+
+export const putItinerary = (itineraryName, data) =>
+  MIHapi.put(`api/itinerary?itineraryName=${itineraryName}`, data, {
+    params: null, // 设置params为null
+  });
+
+export const postItinerary = (data) => MIHapi.post(`api/itinerary`, data);
+
+export const deleteItinerary = (itineraryName) =>
+  MIHapi.delete(`api/itinerary?itineraryName=${itineraryName}`);

@@ -23,17 +23,26 @@ const asideLgCloseClick = (event) => {
 </script>
 
 <template>
+  <!-- 20230914 -->
   <AsideMenuLayer
     :menu="menu"
     :class="[
-      isAsideMobileExpanded ? 'left-0' : '-left-60 lg:left-0',
-      { 'lg:hidden xl:flex': !isAsideLgActive },
+      // isAsideMobileExpanded ? 'left-0' : '-left-60 lg:left-0',
+      // { 'lg:hidden xl:flex': !isAsideLgActive },
+      'transition-all',
+      isAsideLgActive
+        ? 'translate-x-0 opacity-100 delay-300'
+        : '-translate-x-full lg:opacity-0 xl:opacity-100',
+      isAsideMobileExpanded && '-translate-x-full !opacity-100',
     ]"
     @menu-click="menuClick"
     @aside-lg-close-click="asideLgCloseClick"
   />
   <OverlayLayer
-    v-show="isAsideLgActive"
+    :class="[
+      'transition-all',
+      isAsideLgActive ? 'opacity-100' : 'pointer-events-none opacity-0',
+    ]"
     z-index="z-30"
     @overlay-click="asideLgCloseClick"
   />
