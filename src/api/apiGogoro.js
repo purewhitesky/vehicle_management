@@ -8,10 +8,10 @@ export const apiGetGogoroList = () => {
   return apiGogoro.get(`/gostation_site`);
 };
 
-export const apiPostGogoroVMS = (data) => {
-  return apiGogoro.post(`/vms`, data);
+export const apiGetGogoroVMS = (data) => {
+  return apiGogoro.get(`/vms`, data);
 };
 
-export const apiPostGogoroVM = (data) => {
-  return apiGogoro.post(`/vm`, data);
+export const apiGetGogoroVM = (data) => {
+  return apiGogoro.get(`/vm_statuses?${data}`);
 };
