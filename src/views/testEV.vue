@@ -1,23 +1,23 @@
 <script setup>
+import BaseButton from "@/components/BaseButton.vue";
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
 import TomTomStyle from "@/style/tomtomstyle.json";
 import * as turf from "@turf/turf";
-import BaseButton from "@/components/BaseButton.vue";
-import { ref, reactive, onMounted, computed } from "vue";
+import qs from "qs";
 import { mdiEvStation } from "@mdi/js";
-import { apiGetGogoroList, apiPostGogoroVM } from "@/api/apiGogoro";
+import { apiGetGogoroList, apiGetGogoroVM } from "@/api/apiGogoro";
 import { useSetIcon } from "@/components/useTomTomIconElement";
-import CardBox from "@/components/CardBox.vue";
-import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
+import { elementCreator, popupOffsets } from "@/components/HtmlCreator";
+import { ref, onMounted } from "vue";
+
 const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
 const mapRef = ref(null);
 const center = { lat: 25.034228, lng: 121.563995 };
 const isEVOpen = ref(false);
 const ownGPSLocation = ref();
-const gogoroClick = ref(false);
 onMounted(() => {
   let map = tt.map({
     key: TOMTOMKEY,
@@ -26,7 +26,6 @@ onMounted(() => {
     center: center,
     style: TomTomStyle,
   });
-  let geolocateControl;
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());
   map.addControl(
@@ -36,24 +35,11 @@ onMounted(() => {
       },
       trackUserLocation: true,
     }).on("geolocate", function (event) {
-      //console.log(event.coords);
       ownGPSLocation.value = event.coords;
       //console.log("緯度：" + ownGPSLocation.value.latitude);
       //console.log("經度：" + ownGPSLocation.value.longitude);
     })
   );
-  map.on("click", (event) => {
-    //Listprojects()
-    gogoroClick.value = !gogoroClick.value;
-    console.log(event);
-    //觸發測試
-    //getReport(event.lngLat.lng, event.lngLat.lat);
-  });
-
-  /*map.on("click", (event) => {
-    const position = event.lngLat;
-    console.log(position);
-  });*/
 
   map.on("moveend", () => {
     if (navigationOpen.value == false) {
@@ -64,29 +50,99 @@ onMounted(() => {
     }
   });
 
-  //console.log(map.getBounds());
-
   window.map = map;
 });
-
-const gogoraList = ref([]);
+const gogoroList = ref([]);
+const gogoroVMList = ref([]);
+let gBattery = {};
 apiGetGogoroList().then((res) => {
   console.log(res.data);
-  console.log(res);
   res.data.data.forEach((item, index) => {
-    useSetIcon(
-      {
-        lng: item.longitude,
-        lat: item.latitude,
-      },
-      index,
-      "40px",
-      `/Gogoro_icon3.png`,
-      window.map
-    );
+    if (item.vm_id_list != undefined) {
+      gogoroVMList.value.push(...item.vm_id_list);
+    }
   });
+  gogoroList.value = res.data.data;
+  let glist = qs.stringify({ vm: gogoroVMList.value }, { indices: false });
 
-  console.log(gogoraList.value);
+  apiGetGogoroVM(glist).then((res) => {
+    res.data.data.forEach((item) => {
+      gBattery[item.vm_id] = item.battery_count;
+    });
+    gogoroList.value.forEach((item, index) => {
+      //console.log(item);
+      let _tatalbattery = 0;
+      if (item.vm_id_list != undefined) {
+        item.vm_id_list.forEach((vmID) => {
+          _tatalbattery += gBattery[vmID] || 0;
+        });
+      }
+      const { markerData } = useSetIcon(
+        {
+          lng: item.longitude,
+          lat: item.latitude,
+        },
+        index,
+        "40px",
+        `/Gogoro_icon3.png`,
+        window.map
+      );
+      const popupBoxCreator = () => {
+        const box = elementCreator().element(
+          /*html*/
+          `
+          <div class="text-black text-sm font-bold">
+            ${item.local_name}
+          </div>
+          <div class="text-black text-sm text-center">
+            battery Count 
+            <div class="text-red-500 text-lg text-center ">
+            ${_tatalbattery}
+            </div>
+          </div>`
+        );
+        const button = elementCreator().button(
+          /*html*/
+          `
+          <button class="mt-2 w-full rounded-lg border-2 text-black">
+            Navigation
+          </button>`,
+          (event) => {
+            if (ownGPSLocation.value != undefined) {
+              if (navigationCount.value == 0) {
+                navigationOpen.value = true;
+                navigationCount.value = 1;
+              } else {
+                window.map.removeLayer(`route`);
+                window.map.removeSource(`route`);
+              }
+              // 在此處理 click 事件的程式碼
+              const navigationData = ref([]);
+              console.log(ownGPSLocation.value);
+              navigationData.value[0] = {
+                lng: ownGPSLocation.value.longitude,
+                lat: ownGPSLocation.value.latitude,
+              };
+              navigationData.value[1] = {
+                lng: item.longitude,
+                lat: item.latitude,
+              };
+              route(navigationData.value);
+            } else {
+              console.log("no gps data");
+            }
+          }
+        );
+        box.appendChild(button);
+        return box;
+      };
+      const popup = new tt.Popup({ offset: popupOffsets }).setDOMContent(
+        //textElement
+        popupBoxCreator()
+      );
+      markerData.value[index].setPopup(popup);
+    });
+  });
 });
 
 const EVData = ref({
@@ -102,10 +158,7 @@ const EVData = ref({
 });
 
 const EVNumber = ref([]);
-const openEVstation = (isclose) => {
-  /*if (isclose) {
-    navigationOpen.value = false;
-  }*/
+const openEVstation = () => {
   EVstation(map.getBounds()._sw, map.getBounds()._ne);
 };
 const EVstation = (sw, ne) =>
@@ -130,49 +183,42 @@ const EVstation = (sw, ne) =>
         console.log("Open");
       }
       console.log(response);
-      //console.log(response.results);
-      /*var chargingStationID = response.results[0].entryPoints.info;
-      tts.services
-        .evChargingStationsAvailability({
-          key: TOMTOMKEY,
-          chargingAvailability: "124599002464658",
-        })
-        .then(callbackFn);*/
       response.results.forEach((marker, index) => {
         iconElement(marker, index, 0, isEVOpen.value);
       });
-      //console.log(EVNumber.value);
       isEVOpen.value = true;
     });
 
-let markerHeight = 30,
-  markerRadius = 10,
-  linearOffset = 25;
-let popupOffsets = {
-  top: [0, 0],
-  "top-left": [0, 0],
-  "top-right": [0, 0],
-  bottom: [0, -markerHeight],
-  "bottom-left": [
-    linearOffset,
-    (markerHeight - markerRadius + linearOffset) * -1,
-  ],
-  "bottom-right": [
-    -linearOffset,
-    (markerHeight - markerRadius + linearOffset) * -1,
-  ],
-  left: [markerRadius, (markerHeight - markerRadius) * -1],
-  right: [-markerRadius, (markerHeight - markerRadius) * -1],
-};
-
 const navigationCount = ref(0);
 const navigationOpen = ref(false);
+
+function route(data) {
+  let roadline = "";
+  tts.services
+    .calculateRoute({
+      key: TOMTOMKEY,
+      locations: data,
+    })
+    .then(function (res) {
+      roadline = res.toGeoJson().features;
+      roadline.forEach((features, index) => {
+        window.map.addLayer({
+          id: "route",
+          type: "line",
+          source: {
+            type: "geojson",
+            data: features,
+          },
+        });
+      });
+    });
+}
+
 function iconElement(marker, index, iconlistNum, isOpen) {
-  console.log(marker);
+  //console.log(marker);
   if (isOpen) {
     removeMarker(EVNumber.value);
   }
-  //console.log(marker);
   //================================================
 
   const svgElement = document.createElementNS(
@@ -194,60 +240,8 @@ function iconElement(marker, index, iconlistNum, isOpen) {
   // 將 SVG 元素添加到文檔中的 body 元素中
   document.body.appendChild(svgElement);
 
-  const buttonElement = document.createElement("button");
-  buttonElement.textContent = "Navigation"; // 按鈕上的文字
-  buttonElement.className = "mt-2 w-full rounded-lg border-2 "; // 添加類別
-
-  // 綁定 click 事件的處理函式
-  buttonElement.addEventListener("click", (event) => {
-    if (navigationCount.value == 0) {
-      navigationOpen.value = true;
-      navigationCount.value = 1;
-    } else {
-      window.map.removeLayer(`route`);
-      window.map.removeSource(`route`);
-    }
-    // 在此處理 click 事件的程式碼
-    const navigationData = ref([]);
-    console.log(ownGPSLocation.value);
-    console.log(EVNumber.value[index].getLngLat());
-    navigationData.value[0] = {
-      lng: ownGPSLocation.value.longitude,
-      lat: ownGPSLocation.value.latitude,
-    };
-    navigationData.value[1] = EVNumber.value[index].getLngLat();
-    route(navigationData.value);
-  });
-
-  function route(data) {
-    let roadline = "";
-    tts.services
-      .calculateRoute({
-        key: TOMTOMKEY,
-        locations: data,
-      })
-      .then(function (res) {
-        roadline = res.toGeoJson().features;
-        roadline.forEach((features, index) => {
-          window.map.addLayer({
-            id: "route",
-            type: "line",
-            source: {
-              type: "geojson",
-              data: features,
-            },
-          });
-        });
-      });
-  }
-
-  const textElement = document.createElement("div");
-  textElement.className = "text-black";
   let chargData = "";
   marker.chargingPark.connectors.map((value, index) => {
-    /*console.log(
-      EVData.value[marker.chargingPark.connectors[index].connectorType].name
-    );*/
     chargData += `
     <br>RatedPowerKW：${marker.chargingPark.connectors[index].ratedPowerKW}
     <br>connectorType：${
@@ -255,60 +249,58 @@ function iconElement(marker, index, iconlistNum, isOpen) {
     }
     `;
   });
-  console.log(chargData);
 
-  textElement.innerHTML = `${marker.poi.name}
-    ${chargData}`;
-  textElement.appendChild(buttonElement);
-
-  const elementCreator = () => {
-    const generator = (innerHTML) => {
-      const parser = new DOMParser();
-      const testElement = parser.parseFromString(innerHTML, "text/html");
-      return testElement.body;
-    };
-
-    return {
-      element: (innerHTML) => {
-        return generator(innerHTML);
-      },
-      button: (innerHTML, onClickCallBack) => {
-        const btn = generator(innerHTML);
-        btn.addEventListener("click", onClickCallBack);
-        return btn;
-      },
-    };
-  };
-
+  const markerData = ref(marker.chargingPark.connectors[0].connectorType);
+  console.log(markerData.value);
   const popupBoxCreator = () => {
     const box = elementCreator().element(
       /*html*/
-      `<div class="text-red-500 text-lg font-bold">
-        測試
-        
-      </div>`
+      `
+      <div class="text-black text-sm font-bold">
+        ${marker.poi.name}
+      </div>
+      <div class="text-black text-sm ">
+        ${chargData}
+      </div>
+      `
     );
-
     const button = elementCreator().button(
       /*html*/
-      `<button class="mt-2 w-full rounded-lg border-2">
+      `<button class="mt-2 w-full rounded-lg border-2 text-black">
         Navigation
       </button>`,
-      () => {
-        console.log("clickiiiiiiiii");
+      (event) => {
+        if (ownGPSLocation.value != undefined) {
+          if (navigationCount.value == 0) {
+            navigationOpen.value = true;
+            navigationCount.value = 1;
+          } else {
+            window.map.removeLayer(`route`);
+            window.map.removeSource(`route`);
+          }
+          // 在此處理 click 事件的程式碼
+          const navigationData = ref([]);
+          console.log(ownGPSLocation.value);
+          console.log(EVNumber.value[index].getLngLat());
+          navigationData.value[0] = {
+            lng: ownGPSLocation.value.longitude,
+            lat: ownGPSLocation.value.latitude,
+          };
+          navigationData.value[1] = EVNumber.value[index].getLngLat();
+          route(navigationData.value);
+        } else {
+          console.log("no gps data");
+        }
       }
     );
-
     box.appendChild(button);
-
     return box;
   };
 
   const popup = new tt.Popup({ offset: popupOffsets }).setDOMContent(
-    // textElement
+    //textElement
     popupBoxCreator()
   );
-  console.log(textElement);
   EVNumber.value[index] = new tt.Marker({ element: svgElement })
     .setLngLat(marker.position)
     .addTo(window.map);
@@ -334,29 +326,11 @@ const removeMarker = () => {
         label="View nearby charging stations"
         @click="openEVstation(true)"
       ></BaseButton>
-      <!--<button class="w-full rounded-lg border-2" @click="navigation()">
-        navigation
-      </button>-->
       <div
         class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
         id="map"
         ref="mapRef"
       ></div>
-      <Transition>
-        <template v-if="gogoroClick">
-          <CardBox
-            class="absolute left-10 bottom-[5%] h-[82%] w-[23%] overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
-          >
-            <CardBoxComponentTitle
-              title="VINID"
-              main
-              class="border-b-2 border-slate-400"
-            ></CardBoxComponentTitle>
-
-            <div>|</div>
-          </CardBox>
-        </template>
-      </Transition>
     </div>
   </LayoutAuthenticated>
 </template>
