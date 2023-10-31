@@ -28,6 +28,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/tomtomapi/, "/"),
       },
+      "/api": {
+        target: "https://dev-login.webfleet.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, "/"),
+      },
     },
   },
   resolve: {

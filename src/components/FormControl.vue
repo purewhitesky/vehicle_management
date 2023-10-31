@@ -44,6 +44,10 @@ const props = defineProps({
     type: [String, Number, Boolean, Array, Object],
     default: "",
   },
+  errorMassage: {
+    type: [String],
+    default: "",
+  },
   required: Boolean,
   borderless: Boolean,
   transparent: Boolean,
@@ -167,5 +171,6 @@ if (props.ctrlKFocus) {
       :class="inputElClass"
     />
     <FormControlIcon v-if="icon" :icon="icon" :h="controlIconH" />
+    <div v-if="errorMassage" class="text-red-500">{{ errorMassage }}</div>
   </div>
 </template>

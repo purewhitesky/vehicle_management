@@ -246,7 +246,7 @@ const updataFenceRange = (setAddData, event) => {
 const postData = (data) => {
   postItinerary(data).then((res) => {
     console.log(res);
-    window.location.href = "/ListItineraryMap";
+    window.location.href = "/ListItineraryMap2";
   });
 };
 
@@ -594,8 +594,9 @@ const a = () => {
   console.log("use");
 };
 </script>
+
 <template>
-  <LayoutAuthenticated>
+  <div class="m-2 rounded-lg bg-white bg-opacity-10 p-2 shadow-lg">
     <!--{{ see }}-->
     <SectionTitleLineWithButton class="mx-6" :title="'Itinerary ' + id" main>
     </SectionTitleLineWithButton>
@@ -771,7 +772,7 @@ const a = () => {
                   <BaseIcon :path="mdiArrowUp" class="group-hover:rotate-180" />
                 </div>
                 <div
-                  class="absolute hidden w-full divide-y rounded-lg border bg-[#333333] group-hover:block"
+                  class="absolute hidden w-full divide-y rounded-lg border bg-gray-300 group-hover:block"
                 >
                   <div
                     v-for="(carNumber, index) in PermissionsCarlist"
@@ -791,5 +792,5 @@ const a = () => {
         </CardBox>
       </template>
     </div>
-  </LayoutAuthenticated>
+  </div>
 </template>

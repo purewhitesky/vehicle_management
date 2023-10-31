@@ -53,7 +53,8 @@ export function catchCounter(err, func) {
     });
   }
 }
-export function useSetTomTomData(
+
+export function useSetTomTom(
   itineraryName,
   fenceCoordinatesData,
   objectNameArray,
@@ -214,55 +215,36 @@ export function useSetTomTomData(
       });
   };
   const objectOK = ref(false);
-  const AddNewObject = async (pID, iName, counter = 0) => {
-    saveObjectNameList.value.forEach((oName, index) => {
-      apiAddnewobject(ADMINKEY, {
-        name: `${oName}`,
+  
+    const AddNewObject = async (pID, iName, counter = 0, callback = null) => {
+    const apis = saveObjectNameList.value.map((obj) => {
+      return apiAddnewobject(ADMINKEY, {
+        name: `${obj}`,
         defaultProject: pID,
-      })
-        .then((res) => {
+      });
+    });
+
+    Promise.all(apis)
+      .then((results) => {
+        results.forEach( res => {
           objectIDList.value.push(res.data.id);
           console.log(`ADD ${res.data.id} object success`);
         })
-        .catch((err) => {
-          catchCounter(err, AddNewObject(pID, iName, counter));
-        });
 
-      if (saveObjectNameList.value.length == index + 1) {
-        objectOK.value = true;
-      }
-    });
+        if(callback) {
+          callback()
+        }
+      })
+      .catch((err) => {
+        catchCounter(err, AddNewObject(pID, iName, counter));
+      });
   };
-  //20230914
-  // const AddNewObject_NEW = async (pID, iName, counter = 0, callback = null) => {
-  //   const apis = saveObjectNameList.value.map((obj) => {
-  //     return apiAddnewobject(ADMINKEY, {
-  //       name: `${obj}`,
-  //       defaultProject: pID,
-  //     });
-  //   });
-
-  //   Promise.all(apis)
-  //     .then((results) => {
-  //       results.forEach( res => {
-  //         objectIDList.value.push(res.data.id);
-  //         console.log(`ADD ${res.data.id} object success`);
-  //       })
-
-  //       if(callback) {
-  //         callback()
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       catchCounter(err, AddNewObject_NEW(pID, iName, counter));
-  //     });
-  // };
 
   const AddnewContactGroup = async (iName, counter = 0) => {
     const contactGroupData = ref({
       name: `${iName}_notification`,
       webhookUrls: [
-        "https://mih-fleet3.westus2.cloudapp.azure.com/api/geofence",
+        "https://mih-fleet.westus2.cloudapp.azure.com/api/geofence",
       ],
       emails: [],
     });
@@ -282,10 +264,10 @@ export function useSetTomTomData(
       name: `${iName}_Leavel`,
       project: pID,
       fence: fID,
-      object: objectIDList.value[0],
+      object: "*",
       alertType: "TRANSITION",
       alertRuleConstraints: {
-        transitionType: "ALL",
+        transitionType: "EXIT",
       },
       notificationGroup: nID,
       enabled: true,
@@ -301,13 +283,6 @@ export function useSetTomTomData(
         catchCounter(err, AddnewAlertRules(pID, fID, nID, iName, counter));
       });
   };
-  const see = async () => {
-    console.log(`pID:${projectID.value}`);
-    console.log(`fID:${fenceID.value}`);
-    console.log(`oID:${objectIDList.value}`);
-    console.log(`nID:${notificationID.value}`);
-    console.log(`rID:${alertRuleID.value}`);
-  };
   const performTomTomSetup = async () => {
     await Listprojects();
     await ListNotification(itineraryName);
@@ -317,7 +292,6 @@ export function useSetTomTomData(
     if (saveNotificationName.value) {
       await AddnewContactGroup(itineraryName);
     }
-
     if (projectID.value) {
       await Listfences(projectID.value);
       await ListObjects(itineraryName, objectNameArray);
@@ -335,216 +309,6 @@ export function useSetTomTomData(
         saveObjectNameList.value.length = 0;
       }
     }
-    if (
-      projectID.value &&
-      fenceID.value &&
-      objectOK.value &&
-      notificationID.value
-    ) {
-      await ListAlertRules(projectID.value, fenceID.value, itineraryName);
-      console.log("success");
-    }
-    if (saveRouteName.value !== 0) {
-      await AddnewAlertRules(
-        projectID.value,
-        fenceID.value,
-        notificationID.value,
-        itineraryName
-      );
-      see();
-    }
-
-    //20230914
-    // AddNewObject_NEW(projectID.value, itineraryName,0, async ()=> {
-    //   await AddnewAlertRules(
-    //     projectID.value,
-    //     fenceID.value,
-    //     notificationID.value,
-    //     itineraryName
-    //   );
-    //   see();
-    // });
   };
-  performTomTomSetup();
-}
-
-export function useDeleteTomTomData(itineraryName, objectNameArray) {
-  initializationData();
-  const retryTimes = 10;
-  const Listprojects = async (counter = 0) => {
-    await apiListprojects()
-      .then((res) => {
-        const projectCompare = res.data.projects.find(
-          (item) => item.name === itineraryName //尋找元素內的資料
-        );
-        if (projectCompare != undefined) {
-          projectID.value = projectCompare.id;
-          console.log(`${itineraryName} is register`);
-          //Deleteprojects(projectCompare.id);
-        } else {
-          saveProjectName.value = itineraryName;
-          console.log(`${itineraryName} no register`);
-        }
-      })
-      .catch((err) => {
-        catchCounter(err, Listprojects(counter));
-      });
-  };
-  const Listfences = async (pID, iName, counter = 0) => {
-    await apiListthefencesforagivenproject(pID)
-      .then((res) => {
-        console.log(res.data);
-        const fenceCompare = res.data.fences.find(
-          (item) => item.name === `${iName}_fence` //尋找元素內的資料
-        );
-        if (fenceCompare != undefined) {
-          fenceID.value = fenceCompare.id;
-          console.log(`${iName}_fence is register`);
-          //Deletefencetoaproject(fenceCompare.id);
-        } else {
-          saveFenceName.value = `${itineraryName}_fence`;
-          console.log(`${itineraryName}_fence no register`);
-        }
-      })
-      .catch((err) => {
-        catchCounter(err, Listfences(pID, iName, counter));
-      });
-  };
-  const ListObjects = async (iName, oNameArray, counter = 0) => {
-    saveObjectNameList.value = [];
-    await apiListobjects()
-      .then((res) => {
-        console.log(res.data);
-        oNameArray.forEach((oName) => {
-          const objectCompare = res.data.objects.find(
-            (item) => item.name === `${iName}_${oName}_object` //尋找元素內的資料
-          );
-          if (objectCompare != undefined) {
-            objectIDList.value.push(objectCompare.id);
-            console.log(`${iName}_${oName}_object is register`);
-            Deleteobject(objectCompare.id);
-          } else {
-            saveObjectNameList.value.push(`${iName}_${oName}_object`);
-            console.log(`${iName}_${oName}_object no register`);
-          }
-        });
-      })
-      .catch((err) => {
-        catchCounter(err, ListObjects(iName, oNameArray, counter));
-      });
-  };
-  const ListNotification = async (iName, counter = 0) => {
-    await apiNotifications
-      .ListContactGroups()
-      .then((res) => {
-        const notificationCompare = res.data.groups.find(
-          (item) => item.name === `${iName}_notification`
-        );
-        if (notificationCompare != undefined) {
-          notificationID.value = notificationCompare.id;
-          console.log(`${iName}_notification is register`);
-          DeleteContactGroup(notificationCompare.id);
-        } else {
-          saveNotificationName.value = `${iName}_notification`;
-          console.log(`${iName}_notification no register`);
-        }
-      })
-      .catch((err) => {
-        catchCounter(err, ListNotification(iName, counter));
-      });
-  };
-  const ListAlertRules = async (pID, fID, iName, counter = 0) => {
-    saveRouteName.value = [];
-    await apiGeofencing
-      .ListAlertRules(pID, fID)
-      .then((res) => {
-        console.log(res.data);
-        const rulesCompare = res.data.alertRules.find(
-          (item) => item.name === `${iName}_Leavel` //尋找元素內的資料
-        );
-        if (rulesCompare != undefined) {
-          alertRuleID.value = rulesCompare.id;
-          console.log(`${iName}_Leavel is register`);
-          DeleteAlertRules(rulesCompare.id);
-        } else {
-          saveRouteName.value.push(`${iName}_Leavel`);
-          console.log(`${iName}_Leavel no register`);
-        }
-      })
-      .catch((err) => {
-        catchCounter(err, ListAlertRules(pID, fID, iName, counter));
-      });
-  };
-  const see = async () => {
-    console.log(`pID:${projectID.value}`);
-    console.log(`fID:${fenceID.value}`);
-    console.log(`oID:${objectIDList.value}`);
-    console.log(`nID:${notificationID.value}`);
-    console.log(`rID:${alertRuleID.value}`);
-  };
-  const Deleteprojects = async (pID, counter = 0) => {
-    await apiDeleteprojects(pID, ADMINKEY)
-      .then((res) => {
-        console.log("project is Delete");
-        console.log(res);
-      })
-      .catch((err) => {
-        catchCounter(err, Deleteprojects(pID, counter));
-      });
-  };
-  const Deletefencetoaproject = async (fID, counter = 0) => {
-    await apiDeletefence(fID, ADMINKEY)
-      .then((res) => {
-        console.log(fID + "_fence is Delete");
-        console.log(res.data);
-      })
-      .catch((err) => {
-        catchCounter(err, Deletefencetoaproject(fID, counter));
-      });
-  };
-  const Deleteobject = async (oID, counter = 0) => {
-    await apiDeleteobject(oID, ADMINKEY)
-      .then((res) => {
-        console.log(oID + "_object is Delete");
-      })
-      .catch((err) => {
-        catchCounter(err, Deleteobject(oID, counter));
-      });
-  };
-  const DeleteContactGroup = async (nID, counter = 0) => {
-    await apiNotifications
-      .DeleteContactGroup(nID)
-      .then((res) => {
-        console.log(nID + "_ContactGroup is Delete");
-      })
-      .catch((err) => {
-        catchCounter(err, DeleteContactGroup(nID, counter));
-      });
-  };
-  const DeleteAlertRules = async (rID, counter = 0) => {
-    apiGeofencing
-      .DeleteAlertRule(rID, ADMINKEY)
-      .then((res) => {
-        console.log(rID + "_Rules is Delete");
-      })
-      .catch((err) => {
-        catchCounter(err, DeleteAlertRules(rID, counter));
-      });
-  };
-  const performTomTomSetup = async () => {
-    await Listprojects();
-    await ListNotification(itineraryName);
-    if (projectID.value) {
-      await Listfences(projectID.value, itineraryName);
-      await ListObjects(itineraryName, objectNameArray);
-    }
-    if (projectID.value && fenceID.value) {
-      console.log("success delete");
-      await ListAlertRules(projectID.value, fenceID.value, itineraryName);
-      await see();
-      //await Deletefencetoaproject(fenceID.value);
-      await Deleteprojects(projectID.value);
-    }
-  };
-  performTomTomSetup();
+  const 
 }

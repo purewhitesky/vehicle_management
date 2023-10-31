@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, watch, ref } from "vue";
 import { useRouter } from "vue-router";
 import { mdiAccount, mdiAsterisk } from "@mdi/js";
 import SectionFullScreen from "@/components/SectionFullScreen.vue";
@@ -15,8 +15,8 @@ import { useMainStore } from "@/stores/main";
 //useMainStore().setPermissions("1");
 //console.log()
 const form = reactive({
-  login: "Joun",
-  pass: "abcd1234",
+  login: "",
+  pass: "",
   remember: true,
 });
 
@@ -25,6 +25,17 @@ const router = useRouter();
 const submit = () => {
   router.push("/");
 };
+
+const errorMassage = ref("");
+watch(form, () => {
+  console.log("123");
+  console.log(form.login.length);
+  if (form.login.length <= 10) {
+    errorMassage.value = "error";
+  } else {
+    errorMassage.value = "";
+  }
+});
 </script>
 
 <template>
@@ -37,6 +48,7 @@ const submit = () => {
             :icon="mdiAccount"
             name="login"
             autocomplete="username"
+            :errorMassage="errorMassage"
           />
         </FormField>
 

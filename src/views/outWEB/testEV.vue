@@ -14,7 +14,7 @@ import {
   useSetSVGIcon,
 } from "@/components/useTomTomIconElement";
 import { elementCreator, popupOffsets } from "@/components/HtmlCreator";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 
 //=======================================
 //setting
@@ -32,6 +32,7 @@ const center1 = [
 ];
 const isEVOpen = ref(false);
 const ownGPSLocation = ref();
+
 onMounted(() => {
   let map = tt.map({
     key: TOMTOMKEY,
@@ -68,6 +69,7 @@ onMounted(() => {
   center1.map((car) => {
     useSetSVGIcon(car, 0, "30px", mdiCar, window.map);
   });
+  selectButton(0);
 });
 
 const gogoroList = ref([]);
@@ -160,7 +162,7 @@ const gogoro = (open) => {
                 }
               }
             );
-            box.appendChild(button);
+            //box.appendChild(button);//close
             return box;
           };
           const popup = new tt.Popup({ offset: popupOffsets }).setDOMContent(
@@ -211,6 +213,7 @@ const openEVstation = () => {
 const EVstation = (sw, ne) =>
   tts.services
     .fuzzySearch({
+      language: "en-US",
       key: TOMTOMKEY,
       query: "",
       categorySet: "7309",
@@ -352,7 +355,7 @@ function iconElement(marker, index, iconlistNum, isOpen) {
         }
       }
     );
-    box.appendChild(button);
+    //box.appendChild(button); //close
     return box;
   };
 
@@ -374,62 +377,59 @@ const removeMarker = () => {
 
   isEVOpen.value = false;
 };
-let saveCurrentTarget = {};
 
-const selectButton = (e, buttonName) => {
-  e.currentTarget.classList.add("text-green-500");
-  if (e.currentTarget !== saveCurrentTarget) {
-    if (Object.keys(saveCurrentTarget).length > 0) {
-      saveCurrentTarget.classList.remove("text-green-500");
-      console.log(saveCurrentTarget);
+const saveOldIndex = ref(-1);
+const selectButton = (index) => {
+  arrayButton.value[index].textGreen = "text-green-500";
+  console.log("saveOldIndex:" + saveOldIndex.value);
+  console.log("index:" + index);
+  if (index != saveOldIndex.value) {
+    if (saveOldIndex.value >= 0) {
+      arrayButton.value[saveOldIndex.value].textGreen = "";
     }
-    saveCurrentTarget = e.currentTarget;
+    saveOldIndex.value = index;
   }
-  console.log(buttonName);
-  switch (buttonName) {
-    case "Battery swap station":
+  switch (arrayButton.value[index].name) {
+    case "Battery Swap Station":
       tomtom(false);
       gogoro(true);
       console.log("gOK");
       break;
-    case "charging station":
+    case "Charging Station":
       tomtom(true);
       gogoro(false);
       break;
-    case "All":
-      tomtom(true);
-      gogoro(true);
-      break;
   }
 };
+
+const arrayButton = ref([
+  { name: "Battery Swap Station", textGreen: "" },
+  { name: "Charging Station", textGreen: "" },
+]);
 </script>
 <template>
-  <LayoutAuthenticated>
-    <div class="relative m-6">
-      <div
-        class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
-        id="map"
-        ref="mapRef"
-      ></div>
+  <div class="m-2 rounded-lg bg-white bg-opacity-10 p-2 shadow-lg">
+    <div
+      class="mt-2 h-[80vh] w-auto lg:h-[80vh] lg:w-[100%]"
+      id="map"
+      ref="mapRef"
+    ></div>
+    <!--<BaseButton
+      class="absolute left-5 top-5 border-2 border-gray-200 dark:border-gray-500"
+      label="View nearby Charging Stations"
+      @click="openEVstation(true)"
+    ></BaseButton>-->
+    <div class="absolute left-5 top-[4%]">
       <BaseButton
-        class="absolute top-5 left-5 border-2 border-gray-200 dark:border-gray-500"
-        label="View nearby charging stations"
-        @click="openEVstation(true)"
+        v-for="(BattonData, index) in arrayButton"
+        :class="BattonData.textGreen"
+        class="m-2 border-2 border-gray-200 dark:border-gray-500"
+        :key="BattonData.name"
+        :label="BattonData.name"
+        @click="selectButton(index)"
       ></BaseButton>
-      <div class="absolute top-[11%] left-5">
-        <BaseButton
-          class="border-2 border-gray-200 dark:border-gray-500"
-          label="Battery swap station"
-          @click="selectButton($event, $event.currentTarget.textContent)"
-        ></BaseButton>
-        <BaseButton
-          class="border-2 border-gray-200 dark:border-gray-500"
-          label="charging station"
-          @click="selectButton($event, $event.currentTarget.textContent)"
-        ></BaseButton>
-      </div>
     </div>
-  </LayoutAuthenticated>
+  </div>
 </template>
 <style scoped>
 .show {

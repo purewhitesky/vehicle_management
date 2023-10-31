@@ -137,6 +137,16 @@ const routes = [
     path: "/testEV",
     name: "testEV",
     component: () => import("@/views/testEV.vue"),
+    meta: { requireAuth: true },
+  },
+  {
+    meta: {
+      title: "testEV2",
+    },
+    path: "/testEV2",
+    name: "testEV2",
+    component: () => import("@/views/outWEB/testEV.vue"),
+    meta: { requireAuth: true },
   },
   {
     meta: {
@@ -172,11 +182,27 @@ const routes = [
   },
   {
     meta: {
-      title: "testRegistrationRoute",
+      title: "testMap",
     },
-    path: "/testRegistrationRoute",
-    name: "testRegistrationRoute",
-    component: () => import("@/views/testRegistrationRoute.vue"),
+    path: "/testMap",
+    name: "testMap",
+    component: () => import("@/views/testMap.vue"),
+  },
+  {
+    meta: {
+      title: "testTire",
+    },
+    path: "/testTire",
+    name: "testTire",
+    component: () => import("@/views/testTire.vue"),
+  },
+  {
+    meta: {
+      title: "T",
+    },
+    path: "/T",
+    name: "T",
+    component: () => import("@/views/T.vue"),
   },
   {
     meta: {
@@ -193,6 +219,22 @@ const routes = [
     path: "/ListItinerary",
     name: "ListItinerary",
     component: () => import("@/views/ListItinerary.vue"),
+  },
+  {
+    meta: {
+      title: "RouteItinerary2",
+    },
+    path: "/RouteItinerary2/:id",
+    name: "RouteItinerary2/:id",
+    component: () => import("@/views/outWEB/RouteItinerary.vue"),
+  },
+  {
+    meta: {
+      title: "ListItineraryMap2",
+    },
+    path: "/ListItineraryMap2",
+    name: "ListItineraryMap2",
+    component: () => import("@/views/outWEB/ListItineraryMap.vue"),
   },
   {
     meta: {
@@ -218,6 +260,14 @@ const routes = [
     name: "Register",
     component: () => import("@/views/Register.vue"),
   },
+  {
+    meta: {
+      title: "vehicleTransportation",
+    },
+    path: "/vehicleTransportation",
+    name: "vehicleTransportation",
+    component: () => import("@/views/outWEB/vehicleTransportation.vue"),
+  },
 ];
 
 const router = createRouter({
@@ -226,6 +276,11 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     return savedPosition || { top: 0 };
   },
+});
+
+router.beforeEach((to, from) => {
+  if (to.meta.requireAuth) {
+  }
 });
 
 export default router;

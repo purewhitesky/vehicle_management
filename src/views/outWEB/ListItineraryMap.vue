@@ -78,6 +78,7 @@ const getData = () => {
     console.log("use");
   }
   getItinerary().then((res) => {
+    console.log(res.data);
     list.value = res.data;
     list.value
       .sort((a, b) => {
@@ -249,6 +250,7 @@ const changeTime = (time) => {
     .then(function (res) {
       roadline = res.toGeoJson().features;
       console.log(roadline);
+
       roadline.forEach((features, index) => {
         console.log("route內:" + index);
         saveRouteName.value.push("route" + dataIndex);
@@ -385,22 +387,15 @@ const removeRoutes = (RouteArr) => {
 //TOMTOMAPI圍欄註冊
 </script>
 <template>
-  <LayoutAuthenticated>
-    <SectionTitleLineWithButton
-      class="mx-6"
-      :icon="mdiListBox"
-      title="Itinerary Overview"
-      main
-    >
-    </SectionTitleLineWithButton>
-    <div class="grid grid-cols-2">
-      <div class="max-h-[80vh] overflow-y-scroll">
+  <div class="m-2 rounded-lg bg-white bg-opacity-10 p-2 shadow-lg">
+    <div class="grid grid-cols-2 gap-2">
+      <div class="h-[80vh] overflow-y-scroll">
         <CardBoxModal
           v-model="modalOneActive"
           title="Please enter a itinerary name"
           button-label="Confirm"
           has-cancel
-          :buttonTo="`/RouteItinerary/` + setItineraryName"
+          :buttonTo="`/RouteItinerary2/` + setItineraryName"
         >
           <input
             type="text"
@@ -411,7 +406,7 @@ const removeRoutes = (RouteArr) => {
 
         <div class="p-2">
           <div
-            class="my-2 mx-6 flex min-h-[100px] flex-row-reverse items-center gap-2 px-2 py-4"
+            class="mx-6 my-2 flex min-h-[100px] flex-row-reverse items-center gap-2 px-2 py-4"
           >
             <BaseButton
               color="#333333"
@@ -428,30 +423,14 @@ const removeRoutes = (RouteArr) => {
             >
               <div class="grid content-center gap-4 border-r-2">
                 <template v-if="editList[item.itineraryName]">
-                  <!--<div class="flex flex-col items-center">
-                    <div>route Name :</div>
-                    <input
-                      type="text"
-                      class="flex-1 rounded-xl border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-[#333333] dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                      v-model="searchItineraryName[item.itineraryName]"
-                      :placeholder="item.itineraryName"
-                    />
-                  </div>-->
                   <div class="group relative flex flex-col items-center">
-                    <div>Car Number:</div>
-                    <!--<input
-                      type="text"
-                      class="rounded-xl border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-[#333333] dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                      v-model="searchCarID[item.itineraryName]"
-                      :placeholder="item.VINID"
-                    />{{ searchCarID[item.itineraryName] }}-->
-
+                    <div>Car Number :</div>
                     <div
                       v-for="itemSearch in searchCarID[item.itineraryName]"
                       class="flex"
                     >
                       <div
-                        class="m-1 flex min-w-[180px] flex-row rounded-full bg-gray-500 p-2"
+                        class="m-1 flex min-w-[180px] flex-row rounded-full bg-gray-300 p-2"
                       >
                         <div class="flex-1 place-self-center text-xs">
                           {{ itemSearch }}
@@ -478,7 +457,7 @@ const removeRoutes = (RouteArr) => {
                         />
                       </div>
                       <div
-                        class="absolute hidden w-full divide-y rounded-lg border bg-[#333333] group-hover:block"
+                        class="absolute hidden w-full divide-y rounded-lg border bg-gray-300 group-hover:block"
                       >
                         <div
                           v-for="(carNumber, index) in PermissionsCarlist"
@@ -503,7 +482,7 @@ const removeRoutes = (RouteArr) => {
                 </template>
                 <div>Route Name : {{ item.itineraryName }}</div>
                 <div v-show="!editList[item.itineraryName]">
-                  Car Number:
+                  Car Number :
                   <li v-for="(VID, index) in item.VINID" :key="index">
                     {{ VID }}
                   </li>
@@ -570,5 +549,5 @@ const removeRoutes = (RouteArr) => {
         ref="mapRef"
       ></div>
     </div>
-  </LayoutAuthenticated>
+  </div>
 </template>

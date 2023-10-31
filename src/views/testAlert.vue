@@ -295,7 +295,7 @@ const setCameraOpen = (iconData) => {
         timer = setTimeout(function () {
           console.log("程序结束");
           openCamera.value = false;
-        }, 5000);
+        }, 3000);
       }
     }
   } else {
@@ -366,7 +366,7 @@ setInterval(() => {
     });
   }
   setCameraOpen(randomData.value);
-}, 5000);
+}, 3000);
 </script>
 <template>
   <LayoutAuthenticated>
