@@ -1,7 +1,7 @@
 import axios from "axios";
 
 //===profile===
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = import.meta.env.VITE_APP_API_KEY;
 const matrixRoutingVersionNumber = 2;
 const waypointOptimizationVersionNumber = 1;
 const geofencingVersionNumber = 1;

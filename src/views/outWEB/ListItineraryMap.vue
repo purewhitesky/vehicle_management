@@ -3,22 +3,16 @@ import CardBox from "@/components/CardBox.vue";
 import CardBoxModal from "@/components/CardBoxModal.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseIcon from "@/components/BaseIcon.vue";
-import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
-import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import tt from "@tomtom-international/web-sdk-maps";
-import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import TomTomStyle from "@/style/tomtomstyle.json";
+
 import {
   getItinerary,
-  postItinerary,
   putItinerary,
-  getUserAPI,
   deleteItinerary,
 } from "@/api/obd_alwayshow";
 import {
   mdiPlusBox,
-  mdiListBox,
   mdiClipboardEditOutline,
   mdiTrashCanOutline,
   mdiCheck,
@@ -34,7 +28,7 @@ import { ref, onMounted } from "vue";
 
 import * as turf from "@turf/turf";
 
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = import.meta.env.VITE_APP_API_KEY;
 
 const modalOneActive = ref(false);
 const setItineraryName = ref();
@@ -49,7 +43,6 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 10,
     center: center,
-    style: TomTomStyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());
@@ -66,8 +59,6 @@ const range = ref(500);
 
 const list = ref([]); //顯示用
 const editList = ref({}); //編輯開關
-const itineraryPlaceData = ref([]); //單路線
-const itineraryList = ref([]); //多路線
 //GET
 const openItinerary = ref(false);
 
@@ -91,33 +82,8 @@ const getData = () => {
       .forEach((features, dataIndex) => {
         polygon(features, dataIndex, features.fenceRadius);
       });
-    /*
-    list.value.forEach((valueData, index) => {
-      console.log("route:" + index);
-      list.value[index].date = changeTime(list.value[index].date);
-
-      editList.value[valueData.itineraryName] = false;
-      valueData.itinerary.forEach((value1, index1) => {
-        itineraryPlaceData.value[index1] = value1.position; //單條路線儲存
-      });
-      let randomNumber = Math.floor(Math.random() * 900000) + 100000;
-      route(itineraryPlaceData.value, index, `#${randomNumber}`);
-
-      itineraryList.value[index] = itineraryPlaceData.value; //多條路線整合
-      itineraryPlaceData.value = [];
-    });
-    console.log(itineraryList.value);
-    //route(itineraryList.value[0]);*/
   });
   openItinerary.value = true;
-};
-
-//POST
-const postData = async (data) => {
-  await postItinerary(data).then((res) => {
-    console.log(res);
-  });
-  getData();
 };
 
 //PUT
@@ -153,7 +119,6 @@ const ADMINKEY = "lgYpP5hZijPMkKH6ScSIYT3E4djtW9d15DyJ1y3WowXRBBes";
 //編輯
 const searchCarID = ref([]); //車牌
 const searchDate = ref({}); //時間
-const searchItineraryName = ref({}); //行程
 
 const editData = ref({}); //存檔
 const editNum = ref(0); //紀錄修改欄位數量
@@ -223,69 +188,6 @@ const registerOpen = (itineraryName, listIndex) => {
     500
   );
 };
-//=============================================================================
-//自定義格式yyyy-mm-dd
-const changeTime = (time) => {
-  let aData = new Date(time);
-  let Month =
-    aData.getMonth() < 9 ? "0" + (aData.getMonth() + 1) : aData.getMonth() + 1;
-
-  let timeData =
-    aData.getFullYear() + "-" + Month + "-" + aData.getDate() + " ";
-  return timeData;
-};
-
-//=============================================================================
-//路徑畫線
-//const routeName = ref();
-//const retryTimes = 10;
-
-/*const route = (data, dataIndex, routeColor, counter = 0) => {
-  let roadline = "";
-  tts.services
-    .calculateRoute({
-      key: TOMTOMKEY,
-      locations: data,
-    })
-    .then(function (res) {
-      roadline = res.toGeoJson().features;
-      console.log(roadline);
-
-      roadline.forEach((features, index) => {
-        console.log("route內:" + index);
-        saveRouteName.value.push("route" + dataIndex);
-        window.map.addLayer({
-          id: "route" + dataIndex,
-          type: "line",
-          source: {
-            type: "geojson",
-            data: features,
-          },
-          paint: {
-            "line-color": routeColor,
-            "line-width": 4,
-            "line-opacity": 0.5,
-          },
-        });
-      });
-      console.log(saveRouteName.value);
-    })
-    .catch((err) => {
-      console.log(err.response.status);
-      if (
-        (err.response.status == 403 || err.response.status == 429) &&
-        counter < retryTimes
-      ) {
-        counter++;
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve(route(data, dataIndex, routeColor));
-          }, 1000);
-        });
-      }
-    });
-};*/
-
 //=============================================================================
 //存檔名稱
 const saveRouteName = ref([]);

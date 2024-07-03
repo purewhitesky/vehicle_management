@@ -40,7 +40,7 @@ if (
 }
 
 /* Default title tag */
-const defaultDocumentTitle = "MIH";
+const defaultDocumentTitle = "Leo";
 
 /* Set document title from route meta */
 router.afterEach((to) => {

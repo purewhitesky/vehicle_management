@@ -1,13 +1,11 @@
 <script setup>
 import BaseButton from "@/components/BaseButton.vue";
-import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import TomTomStyle from "@/style/tomtomstyle.json";
-import * as turf from "@turf/turf";
+
 import qs from "qs";
-import { mdiEvStation, mdiCar } from "@mdi/js";
+import { mdiCar } from "@mdi/js";
 import { apiGetGogoroList, apiGetGogoroVM } from "@/api/apiGogoro";
 import {
   useSetUrlIcon,
@@ -22,7 +20,7 @@ const gogoroUrlIcon = "/Gogoro_icon3.png";
 const tomtomUrlIcon = "/EV.png";
 
 //=======================================
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = process.env.VITE_APP_API_KEY;
 const mapRef = ref(null);
 const center = { lat: 25.034228, lng: 121.563995 };
 const center1 = [
@@ -39,7 +37,6 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 13,
     center: center,
-    style: TomTomStyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());
@@ -51,8 +48,9 @@ onMounted(() => {
       trackUserLocation: true,
     }).on("geolocate", function (event) {
       ownGPSLocation.value = event.coords;
-      //console.log("緯度：" + ownGPSLocation.value.latitude);
-      //console.log("經度：" + ownGPSLocation.value.longitude);
+
+      console.log("緯度：" + ownGPSLocation.value.latitude);
+      console.log("經度：" + ownGPSLocation.value.longitude);
     })
   );
 

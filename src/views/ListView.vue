@@ -2,7 +2,7 @@
   <LayoutAuthenticated class="relative">
     <div class="m-6">
       <button
-        class="absolute right-[26px] bottom-[50px] h-10 w-10 rounded-full border-2"
+        class="absolute bottom-[50px] right-[26px] h-10 w-10 rounded-full border-2"
         :class="openCamera"
         @click="buttonCamera"
       >
@@ -127,7 +127,6 @@ import { ref, onUnmounted, onMounted } from "vue";
 //import { GoogleMap, Marker, MarkerCluster } from "vue3-google-map";
 import tt from "@tomtom-international/web-sdk-maps";
 import "@tomtom-international/web-sdk-maps/dist/maps.css"; //必須加入
-import tomtomstyle from "@/style/tomtomstyle.json";
 
 import {
   getGPSAPI,
@@ -343,11 +342,10 @@ onMounted(() => {
   }, gpsTimeSpeed.value);
 
   let map = tt.map({
-    key: "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx",
+    key: import.meta.env.VITE_APP_API_KEY,
     container: mapRef.value,
     zoom: 18,
     center: center,
-    style: tomtomstyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());

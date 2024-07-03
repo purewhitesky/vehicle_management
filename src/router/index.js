@@ -12,52 +12,13 @@ const routes = [
   },
   {
     meta: {
-      title: "ChargingMapView",
-    },
-    path: "/ChargingMapView",
-    name: "ChargingMapView",
-    component: () => import("@/views/ChargingMapView.vue"),
-  },
-  {
-    meta: {
       title: "FleetOverview",
     },
     path: "/FleetOverview",
     name: "FleetOverview",
     component: () => import("@/views/FleetOverview.vue"),
   },
-  {
-    meta: {
-      title: "FleetTrackingView",
-    },
-    path: "/FleetTrackingView",
-    name: "FleetTrackingView",
-    component: () => import("@/views/FleetTrackingView.vue"),
-  },
-  {
-    meta: {
-      title: "FleetRepairView",
-    },
-    path: "/FleetRepairView",
-    name: "FleetRepairView",
-    component: () => import("@/views/FleetRepairView.vue"),
-  },
-  {
-    meta: {
-      title: "PermissionsAccountView",
-    },
-    path: "/PermissionsAccountView",
-    name: "PermissionsAccountView",
-    component: () => import("@/views/PermissionsAccountView.vue"),
-  },
-  {
-    meta: {
-      title: "PermissionsPageView",
-    },
-    path: "/PermissionsPageView",
-    name: "PermissionsPageView",
-    component: () => import("@/views/PermissionsPageView.vue"),
-  },
+
   {
     meta: {
       title: "BMS",
@@ -106,30 +67,7 @@ const routes = [
     name: "Error",
     component: () => import("@/views/ErrorView.vue"),
   },
-  {
-    meta: {
-      title: "test",
-    },
-    path: "/test",
-    name: "test",
-    component: () => import("@/views/testView.vue"),
-  },
-  {
-    meta: {
-      title: "test2",
-    },
-    path: "/test2",
-    name: "test2",
-    component: () => import("@/views/test2.vue"),
-  },
-  {
-    meta: {
-      title: "test3",
-    },
-    path: "/test3",
-    name: "test3",
-    component: () => import("@/views/test3.vue"),
-  },
+
   {
     meta: {
       title: "testEV",
@@ -163,38 +101,6 @@ const routes = [
     path: "/testAlert",
     name: "testAlert",
     component: () => import("@/views/testAlert.vue"),
-  },
-  {
-    meta: {
-      title: "testLocationHistory",
-    },
-    path: "/testLocationHistory",
-    name: "testLocationHistory",
-    component: () => import("@/views/testLocationHistory.vue"),
-  },
-  {
-    meta: {
-      title: "testMap",
-    },
-    path: "/testMap",
-    name: "testMap",
-    component: () => import("@/views/testMap.vue"),
-  },
-  {
-    meta: {
-      title: "testMap",
-    },
-    path: "/testMap",
-    name: "testMap",
-    component: () => import("@/views/testMap.vue"),
-  },
-  {
-    meta: {
-      title: "testTire",
-    },
-    path: "/testTire",
-    name: "testTire",
-    component: () => import("@/views/testTire.vue"),
   },
   {
     meta: {
@@ -244,14 +150,7 @@ const routes = [
     name: "ListItineraryMap",
     component: () => import("@/views/ListItineraryMap.vue"),
   },
-  {
-    meta: {
-      title: "SeeTomTom",
-    },
-    path: "/SeeTomTom",
-    name: "SeeTomTom",
-    component: () => import("@/views/SeeTomTom.vue"),
-  },
+
   {
     meta: {
       title: "Register",

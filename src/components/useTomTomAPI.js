@@ -233,37 +233,10 @@ export function useSetTomTomData(
       }
     });
   };
-  //20230914
-  // const AddNewObject_NEW = async (pID, iName, counter = 0, callback = null) => {
-  //   const apis = saveObjectNameList.value.map((obj) => {
-  //     return apiAddnewobject(ADMINKEY, {
-  //       name: `${obj}`,
-  //       defaultProject: pID,
-  //     });
-  //   });
-
-  //   Promise.all(apis)
-  //     .then((results) => {
-  //       results.forEach( res => {
-  //         objectIDList.value.push(res.data.id);
-  //         console.log(`ADD ${res.data.id} object success`);
-  //       })
-
-  //       if(callback) {
-  //         callback()
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       catchCounter(err, AddNewObject_NEW(pID, iName, counter));
-  //     });
-  // };
-
   const AddnewContactGroup = async (iName, counter = 0) => {
     const contactGroupData = ref({
       name: `${iName}_notification`,
-      webhookUrls: [
-        "https://mih-fleet3.westus2.cloudapp.azure.com/api/geofence",
-      ],
+      webhookUrls: [""],
       emails: [],
     });
     await apiNotifications

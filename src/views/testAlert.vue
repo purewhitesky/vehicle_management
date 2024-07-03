@@ -5,7 +5,6 @@ import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 
 import tt from "@tomtom-international/web-sdk-maps";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import TomTomStyle from "@/style/tomtomstyle.json";
 
 import { getCarAlert, getGPSAPI, getUserAPI } from "@/api/obd_alwayshow";
 import { onMounted, ref } from "vue";
@@ -21,7 +20,7 @@ import {
 } from "@mdi/js";
 import BaseButton from "@/components/BaseButton.vue";
 
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = import.meta.env.VITE_APP_API_KEY;
 const center = { lat: 25.08343466748116, lng: 121.40712193411323 };
 const mapRef = ref();
 onMounted(() => {
@@ -30,7 +29,6 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 13,
     center: center,
-    style: TomTomStyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());
@@ -385,7 +383,7 @@ setInterval(() => {
               ref="mapRef"
             ></div>
           </CardBox>
-          <div class="absolute top-10 left-10 flex">
+          <div class="absolute left-10 top-10 flex">
             <div v-for="(item, index) in iconIndex">
               <BaseIcon
                 v-show="item.open"
@@ -473,18 +471,11 @@ setInterval(() => {
             -->
           </div>
           <template v-if="openCamera">
-            <div class="absolute top-[55%] left-[55%]">
-              <!--
-                <p class="bg-black text-white">{{ CameraData }}</p>
-                <img
-                  src="https://mih-fleet3.westus2.cloudapp.azure.com/video_feed"
-                  class="h-[50%] w-[40%]"
-                />
-              -->
+            <div class="absolute left-[55%] top-[55%]">
               <div class="h-40 w-40 bg-black text-white"></div>
             </div>
           </template>
-          <div class="absolute top-[90%] left-[95%]">
+          <div class="absolute left-[95%] top-[90%]">
             <BaseButton label="LIVE" @click="setManual(true)"></BaseButton>
           </div>
         </div>

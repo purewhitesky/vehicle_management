@@ -215,8 +215,8 @@ export function useSetTomTom(
       });
   };
   const objectOK = ref(false);
-  
-    const AddNewObject = async (pID, iName, counter = 0, callback = null) => {
+
+  const AddNewObject = async (pID, iName, counter = 0, callback = null) => {
     const apis = saveObjectNameList.value.map((obj) => {
       return apiAddnewobject(ADMINKEY, {
         name: `${obj}`,
@@ -226,13 +226,13 @@ export function useSetTomTom(
 
     Promise.all(apis)
       .then((results) => {
-        results.forEach( res => {
+        results.forEach((res) => {
           objectIDList.value.push(res.data.id);
           console.log(`ADD ${res.data.id} object success`);
-        })
+        });
 
-        if(callback) {
-          callback()
+        if (callback) {
+          callback();
         }
       })
       .catch((err) => {
@@ -310,5 +310,4 @@ export function useSetTomTom(
       }
     }
   };
-  const 
 }

@@ -4,7 +4,7 @@ import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import TomTomStyle from "@/style/tomtomstyle.json";
+
 import * as turf from "@turf/turf";
 import qs from "qs";
 import { mdiEvStation, mdiCar } from "@mdi/js";
@@ -22,7 +22,7 @@ const gogoroUrlIcon = "/Gogoro_icon3.png";
 const tomtomUrlIcon = "/EV.png";
 
 //=======================================
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = import.meta.env.VITE_APP_API_KEY;
 const mapRef = ref(null);
 const center = { lat: 25.034228, lng: 121.563995 };
 const center1 = [
@@ -38,7 +38,6 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 13,
     center: center,
-    style: TomTomStyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());
@@ -412,11 +411,11 @@ const selectButton = (e, buttonName) => {
         ref="mapRef"
       ></div>
       <BaseButton
-        class="absolute top-5 left-5 border-2 border-gray-200 dark:border-gray-500"
+        class="absolute left-5 top-5 border-2 border-gray-200 dark:border-gray-500"
         label="View nearby charging stations"
         @click="openEVstation(true)"
       ></BaseButton>
-      <div class="absolute top-[11%] left-5">
+      <div class="absolute left-5 top-[11%]">
         <BaseButton
           class="border-2 border-gray-200 dark:border-gray-500"
           label="Battery swap station"

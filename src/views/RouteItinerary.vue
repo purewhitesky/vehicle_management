@@ -9,7 +9,6 @@ import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
 import "@tomtom-international/web-sdk-plugin-searchbox/dist/SearchBox.css";
 
-import TomTomStyle from "@/style/tomtomstyle.json";
 import { ref, reactive, onMounted, computed, watch } from "vue";
 import {
   mdiPlusBox,
@@ -27,7 +26,7 @@ import { postItinerary } from "@/api/obd_alwayshow";
 import { usePermissionsList } from "@/components/PermissionsList";
 import * as turf from "@turf/turf";
 
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = process.env.VITE_APP_API_KEY;
 
 const mapRef = ref(null);
 const center = { lat: 25.034228, lng: 121.563995 };
@@ -41,7 +40,6 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 13,
     center: center,
-    style: TomTomStyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());

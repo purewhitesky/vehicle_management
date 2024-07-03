@@ -48,14 +48,7 @@ const asideLgCloseClick = (event) => {
       >
         <div
           class="mt-3 flex flex-1 flex-col text-center lg:pl-6 lg:text-left xl:pl-0 xl:text-center"
-        >
-          <!--MIH LOGO SETTING-->
-          <img
-            src="https://www.mih-ev.org/img/MIH-consortium-logo_20210728.svg"
-            width="120"
-            class="self-center"
-          />
-        </div>
+        ></div>
         <button
           class="hidden p-3 lg:inline-block xl:hidden"
           @click.prevent="asideLgCloseClick"

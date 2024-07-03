@@ -22,7 +22,7 @@ import * as turf from "@turf/turf";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import TomTomStyle from "@/style/tomtomstyle.json";
+
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import CardBoxComponentTitle from "@/components/CardBoxComponentTitle.vue";
 import BaseButton from "@/components/BaseButton.vue";
@@ -30,7 +30,7 @@ import BaseButtons from "@/components/BaseButtons.vue";
 import CardBox from "@/components/CardBox.vue";
 import BaseIcon from "@/components/BaseIcon.vue";
 
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = import.meta.env.VITE_APP_API_KEY;
 
 const mapRef = ref();
 const center = { lat: 25.08343466748116, lng: 121.40712193411323 };
@@ -77,7 +77,6 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 13,
     center: center,
-    style: TomTomStyle,
   });
 
   map.addControl(new tt.FullscreenControl());
@@ -657,7 +656,7 @@ const Waypoint = (WaypointOptimizationData) => {
             ref="mapRef"
           ></div>
           <CardBox
-            class="absolute right-10 bottom-[5%] h-[40%] w-[23%] overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
+            class="absolute bottom-[5%] right-10 h-[40%] w-[23%] overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
           >
             <CardBoxComponentTitle
               title="Notification"
@@ -694,7 +693,7 @@ const Waypoint = (WaypointOptimizationData) => {
           </CardBox>
           <template v-if="listClick">
             <CardBox
-              class="absolute left-10 bottom-[5%] h-[90%] w-[23%] overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
+              class="absolute bottom-[5%] left-10 h-[90%] w-[23%] overflow-y-auto border-2 border-gray-200 aside-scrollbars-light dark:border-gray-500"
             >
               <CardBoxComponentTitle
                 :title="VINID"

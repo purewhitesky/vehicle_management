@@ -8,7 +8,7 @@ import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import tt from "@tomtom-international/web-sdk-maps";
 import tts from "@tomtom-international/web-sdk-services";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import TomTomStyle from "@/style/tomtomstyle.json";
+
 import {
   getItinerary,
   postItinerary,
@@ -34,7 +34,7 @@ import { ref, onMounted } from "vue";
 
 import * as turf from "@turf/turf";
 
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = import.meta.env.VITE_APP_API_KEY;
 
 const modalOneActive = ref(false);
 const setItineraryName = ref();
@@ -49,7 +49,6 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 10,
     center: center,
-    style: TomTomStyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());
@@ -411,7 +410,7 @@ const removeRoutes = (RouteArr) => {
 
         <div class="p-2">
           <div
-            class="my-2 mx-6 flex min-h-[100px] flex-row-reverse items-center gap-2 px-2 py-4"
+            class="mx-6 my-2 flex min-h-[100px] flex-row-reverse items-center gap-2 px-2 py-4"
           >
             <BaseButton
               color="#333333"

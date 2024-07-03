@@ -88,7 +88,7 @@ import CardBoxComponentBody from "@/components/CardBoxComponentBody.vue";
 import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
 import tt from "@tomtom-international/web-sdk-maps";
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
-import TomTomStyle from "@/style/tomtomstyle.json";
+
 import { ref, onMounted, provide } from "vue";
 import {
   mdiHeartPulse,
@@ -101,7 +101,7 @@ import { THEME_KEY } from "vue-echarts";
 
 provide(THEME_KEY, "dark");
 
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = import.meta.env.VITE_APP_API_KEY;
 const mapRef = ref(null);
 const center = { lat: 25.034228, lng: 121.563995 };
 const option = ref({});
@@ -115,7 +115,6 @@ onMounted(() => {
     container: mapRef.value,
     zoom: 10,
     center: center,
-    style: TomTomStyle,
   });
   map.addControl(new tt.FullscreenControl());
   map.addControl(new tt.NavigationControl());

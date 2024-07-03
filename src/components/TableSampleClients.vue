@@ -10,7 +10,7 @@ import tts from "@tomtom-international/web-sdk-services";
 defineProps({
   checkable: Boolean,
 });
-const TOMTOMKEY = "DGEne3GZIqPKvLGIxmB8xszfh0BU8NEx";
+const TOMTOMKEY = import.meta.env.VITE_APP_API_KEY;
 const PermissionsID = { ID: "1" }; //最高管理權限
 
 const repairData1 = ref([]);

@@ -13,32 +13,16 @@ import {
   mdiTire,
   mdiEvStation,
   mdiCardAccountDetailsOutline,
+  mdiBattery,
+  mdiListBox,
+  mdiTrainCar,
+  mdiAlert,
+  mdiRoadVariant,
+  mdiRegisteredTrademark,
+  mdiCar,
 } from "@mdi/js";
 
 export default [
-  /*{
-    to: "/FleetOverview",
-    label: "Fleet overview",
-    
-    //icon: mdiCarMultiple,
-    menu: [
-      {
-        to: "/list",
-        label: "list",
-        
-        //icon: mdiCarMultiple,
-      },
-      {
-        label: "Item Two",
-      },
-    ],
-  },*/
-  /*{
-    to: "/car",
-    
-    //icon: mdiCar,
-    label: "Car",
-  },*/
   {
     to: "/FleetOverview",
     label: "Dashboard",
@@ -58,75 +42,51 @@ export default [
     icon: mdiMap,
   },
   {
-    to: "/FleetRepairView",
-    label: "PHM",
+    to: "/bms",
+    label: "Battery",
 
-    icon: mdiWrenchClock,
+    icon: mdiBattery,
   },
   {
-    label: "Tire Analysis",
+    to: "/ListItineraryMap2",
+    label: "ListItinerary",
 
-    icon: mdiTire,
+    icon: mdiListBox,
   },
   {
-    label: "DMS",
+    to: "/vehicleTransportation",
+    label: "Transportation",
 
-    icon: mdiCardAccountDetailsOutline,
+    icon: mdiTrainCar,
   },
   {
-    label: "CPO",
+    to: "/T",
+    label: "Transportation2",
 
-    icon: mdiEvStation,
-  },
-
-  /*{
-    to: "/FleetTrackingView",
-    label: "FleetTracking",
-
-    //icon: mdiMap,
-  },
-
-  {
-    to: "/Profile",
-    label: "Profile",
-
-    //icon: mdiAccountCircle,
+    icon: mdiTrainCar,
   },
   {
-    to: "/PermissionsAccountView",
-    label: "PermissionsAccount",
+    to: "/testAlert",
+    label: "Alert",
 
-    //icon: mdiAccountSettings,
+    icon: mdiAlert,
   },
   {
-    to: "/PermissionsPageView",
-    label: "PermissionsPage",
+    to: "/testMapFleet",
+    label: "MapFleet",
 
-    //icon: mdiApplicationSettings,
+    icon: mdiRoadVariant,
   },
   {
-    to: "/Login",
-    label: "Login",
+    to: "/Register",
+    label: "Register",
 
-    //icon: mdiLock,
-  },*/
-  /*{
-    to: "/error",
-    label: "Error",
-    
-    //icon: mdiAlertCircle,
+    icon: mdiRegisteredTrademark,
   },
   {
-    label: "Dropdown",
-    
-    //icon: mdiViewList,
-    menu: [
-      {
-        label: "Item One",
-      },
-      {
-        label: "Item Two",
-      },
-    ],
-  },*/
+    to: "/car",
+    label: "car",
+
+    icon: mdiCar,
+  },
 ];
